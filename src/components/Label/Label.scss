@@ -1,0 +1,9 @@
+.Label {
+  font-size: 0.75rem;
+  font-weight: bold;
+  color: var(--color-text-subdued);
+  &__required {
+    font-size: .65;
+    font-weight: normal;
+  }
+}

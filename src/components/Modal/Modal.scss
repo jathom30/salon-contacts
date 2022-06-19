@@ -1,0 +1,25 @@
+@mixin modal-position {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.Modal {
+  @include modal-position();
+  &__shade {
+    background-color: black;
+    opacity: .5;
+    @include modal-position();
+  }
+  &__content {
+    position: relative;
+    z-index: 10;
+    max-width: 600px;
+    height: min-content;
+    max-height: 100vh;
+    display: flex;
+    margin: 0 auto;
+  }
+}

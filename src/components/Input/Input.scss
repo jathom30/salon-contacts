@@ -1,0 +1,20 @@
+.Input {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  width: 100%;
+  &__container {
+    position: relative;
+    display: flex;
+  }
+  &__input {
+    flex-grow: 1;
+    padding: 0.35rem;
+    font-size: 1rem;
+    border-radius: 0.25rem;
+    border: 1px solid var(--color-text-subdued);
+    position: relative;
+    background: var(--color-component-background);
+    color: var(--color-text);
+  }
+}
