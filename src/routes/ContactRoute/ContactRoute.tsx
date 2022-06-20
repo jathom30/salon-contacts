@@ -183,6 +183,7 @@ const NoteBox = ({note, onDelete, onChange, canDelete}: {note: Note, onDelete: (
     setEdit(false)
   }
 
+  const splitNote = note.details.split('\n')
 
   return (
     <div className="Note">
@@ -199,7 +200,9 @@ const NoteBox = ({note, onDelete, onChange, canDelete}: {note: Note, onDelete: (
           <Button buttonRef={saveButtonRef} kind="primary" icon={faSave} onClick={handleSave}>Save note</Button>
         </>
       ) : (
-        <p>{note.details}</p>
+        splitNote.map((split, i) => (
+          <p key={i}>{split}</p>
+        ))
       )}
     </div>
   )

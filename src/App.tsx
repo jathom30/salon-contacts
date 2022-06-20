@@ -44,7 +44,7 @@ function App() {
               <CreateContactRoute />
             </ProtectedRoute>
           } />
-          <Route path="/login" element={<LoginRoute />} />
+          {/* <Route path="/login" element={<LoginRoute />} /> */}
           <Route path="/:id" element={
             <ProtectedRoute>
               <ContactRoute />
