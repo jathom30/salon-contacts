@@ -5,19 +5,24 @@ import {BrowserRouter} from 'react-router-dom'
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import { IdentityContextProvider } from "react-netlify-identity"
 
 const queryClient = new QueryClient()
+
+const url ="https://salon-contacts.netlify.app"
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 root.render(
   <React.StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    </QueryClientProvider>
+    <IdentityContextProvider url={url}>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </QueryClientProvider>
+    </IdentityContextProvider>
   </React.StrictMode>
 );
 

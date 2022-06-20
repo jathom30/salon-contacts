@@ -17,4 +17,9 @@
     background: var(--color-component-background);
     color: var(--color-text);
   }
+  &__error {
+    font-size: .75rem;
+    font-weight: bold;
+    color: var(--color-danger);
+  }
 }

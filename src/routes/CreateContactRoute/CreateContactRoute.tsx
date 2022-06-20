@@ -1,5 +1,6 @@
 import { createContact } from "api";
 import { Button, FlexBox, Input, Label, Loader } from "components";
+import { useValidatedMask, useValidatedState } from "hooks";
 import React, { FormEvent, useState } from "react";
 import { useMutation } from "react-query";
 import { useNavigate } from "react-router-dom";
@@ -8,15 +9,18 @@ import './CreateContactRoute.scss'
 
 export const CreateContactRoute = () => {
   const [name, setName] = useState('')
-  const [phone, setPhone] = useState('')
-  const [email, setEmail] = useState('')
+  const [phone, setPhone, isValidPhone] = useValidatedMask({
+    initialState: '',
+    validationMask: 'phone-number'
+  })
+  const [email, setEmail, isValidEmail] = useValidatedState('', 'email')
   const [note, setNote] = useState('')
 
   const navigate = useNavigate()
 
   const createContactMutation = useMutation(createContact, {
-    onSuccess: () => {
-      navigate('/')
+    onSuccess: (data) => {
+      navigate(`/${data[0].id}`)
     }
   })
 
@@ -53,12 +57,15 @@ export const CreateContactRoute = () => {
             label="Phone nunber"
             value={phone}
             onChange={setPhone}
+            hasError={!isValidPhone}
           />
+
           <Input
             name="email"
             label="Email"
             value={email}
             onChange={setEmail}
+            hasError={!isValidEmail}
           />
           <FlexBox flexDirection="column" gap=".25rem" flexGrow={1}>
             <Label required>

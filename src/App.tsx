@@ -1,10 +1,18 @@
 import { Header, MaxHeightContainer } from 'components';
 import React, { useEffect } from 'react';
 import {Routes, Route} from 'react-router-dom'
-import { ContactListRoute, ContactRoute, CreateContactRoute } from 'routes';
+import { useIdentityContext } from 'react-netlify-identity'
+import { ContactListRoute, ContactRoute, CreateContactRoute, LoginRoute } from 'routes';
 import './App.scss';
 
+const ProtectedRoute = ({children}: {children: JSX.Element}) => {
+  const { isLoggedIn } = useIdentityContext()
+  return (isLoggedIn || !!process.env.REACT_APP_IS_DEV) ? children : <LoginRoute />
+}
+
 function App() {
+  const { isLoggedIn } = useIdentityContext()
+
   useEffect(() => {
     const handleResize = () => {
       const doc = document.documentElement
@@ -23,12 +31,25 @@ function App() {
     <div className="App">
       <MaxHeightContainer
         fullHeight
-        header={<Header />}
+        header={(isLoggedIn || !!process.env.REACT_APP_IS_DEV) && <Header />}
       >
         <Routes>
-          <Route path="/" element={<ContactListRoute />} />
-          <Route path="/create-new" element={<CreateContactRoute />} />
-          <Route path="/:id" element={<ContactRoute />} />
+          <Route path="/" element={
+            <ProtectedRoute>
+              <ContactListRoute />
+            </ProtectedRoute>
+          } />
+          <Route path="/create-new" element={
+            <ProtectedRoute>
+              <CreateContactRoute />
+            </ProtectedRoute>
+          } />
+          <Route path="/login" element={<LoginRoute />} />
+          <Route path="/:id" element={
+            <ProtectedRoute>
+              <ContactRoute />
+            </ProtectedRoute>
+          } />
         </Routes>
       </MaxHeightContainer>
       
@@ -39,6 +60,6 @@ function App() {
 export default App;
 
 // ! TODO
-// Loader
-// InputLabel on ContactRoute to edit in place
-// Edit/delete notes
+// Auth
+// push to github
+// deploy

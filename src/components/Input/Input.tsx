@@ -1,3 +1,4 @@
+import { FlexBox } from 'components/Box';
 import { Label } from 'components/Label';
 import React, { KeyboardEvent, ReactNode } from 'react';
 import './Input.scss'
@@ -10,7 +11,8 @@ export const Input: React.FC<{
   name: string;
   step?: number
   required?: boolean
-}> = ({label, value, onChange, name, step, required = false, placeholder}) => {
+  hasError?: boolean
+}> = ({label, value, onChange, name, step, required = false, placeholder, hasError = false}) => {
   const type = typeof value === 'string' ? 'string' : 'number'
 
   const handleKeyPress = (e: KeyboardEvent<HTMLInputElement>) => {
@@ -29,8 +31,11 @@ export const Input: React.FC<{
   }
 
   return (
-    <label className='Input' htmlFor={name}>
-      {label && <Label required={required}>{label}</Label>}
+    <label className="Input" htmlFor={name}>
+      <FlexBox alignItems="center" justifyContent="space-between" gap="1rem">
+        {label && <Label required={required}>{label}</Label>}
+        {hasError && <span className='Input__error'>Invalid {label}</span>}
+      </FlexBox>
       <div className="Input__container">
         <input
           className='Input__input'

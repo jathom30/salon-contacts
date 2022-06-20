@@ -7,6 +7,7 @@ import { Contact, Note } from "typings";
 import './ContactRoute.scss'
 import { faPencil, faPlus, faSave, faTimes, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { useOnClickOutside, useValidatedMask } from "hooks";
+import { maskingFuncs } from "hooks/useMask/maskingFuncs";
 
 export const ContactRoute = () => {
   const { id } = useParams()
@@ -16,20 +17,21 @@ export const ContactRoute = () => {
   const newNoteRef = useRef<HTMLTextAreaElement>(null)
   const saveNoteRef = useRef<HTMLButtonElement>(null)
 
+  
   useOnClickOutside([newNoteRef, saveNoteRef], () => {
     setShowNewNote(false)
     setNote('')
   })
-
+  
   const contactQuery = useQuery(
     ['contact', id],
     () => getContact(id || ''),
     { enabled: !!id }
-  )
-
+    )
+    
   const contact = contactQuery.data?.fields as unknown as Contact | undefined
   const notes = contactQuery.data?.fields.notes ? JSON.parse(contactQuery.data?.fields.notes as string) as Note[] | undefined : []
-
+  
   const updateContactMutation = useMutation(updateContact, {
     onSuccess: () => {
       contactQuery.refetch()
@@ -110,16 +112,14 @@ export const ContactRoute = () => {
       ) : (
         <>
           <FlexBox flexDirection="column" gap=".25rem">
-            <LabelInput value={contact?.name || ''} onSubmit={val => handleUpdateDetails(val as string, 'name')}>
-              <div style={{width: '100%'}}>
-                <FlexBox alignItems="center" justifyContent="space-between" gap="0.5rem">
-                  <h1>{contact?.name}</h1>
-                  <Button isRounded icon={faTrash} onClick={handleDeleteContact} kind="danger" />
-                </FlexBox>
-              </div>
-            </LabelInput>
+            <FlexBox alignItems="center" justifyContent="space-between" gap="0.5rem">
+              <LabelInput value={contact?.name || ''} onSubmit={val => handleUpdateDetails(val as string, 'name')}>
+                <h1>{contact?.name}</h1>
+              </LabelInput>
+              <Button isRounded icon={faTrash} onClick={handleDeleteContact} kind="danger" />
+            </FlexBox>
             {contact?.phone_number ? (
-              <LabelInput value={contact.phone_number || ''} onSubmit={val => handleUpdateDetails(val as string, 'phone_number')} placeholder="Add phone number">
+              <LabelInput value={contact.phone_number || ''} onChange={maskingFuncs["phone-number"]} onSubmit={val => handleUpdateDetails(val as string, 'phone_number')} placeholder="Add phone number">
                 <span>{contact.phone_number}</span>
               </LabelInput>
             ) : (
@@ -227,8 +227,7 @@ const AddField = ({label, onSubmit, validation}: {label: string; onSubmit: (newV
       <div className="AddField">
         <form ref={formRef} onSubmit={handleSubmit}>
           <FlexBox gap="1rem">
-            <Input name={label} value={value} onChange={setValue} placeholder={label} />
-            {!isValid && <span className="AddField__warning">Not a valid {validation}</span>}
+            <Input name={label} value={value} onChange={setValue} placeholder={label} hasError={!isValid} />
             <Button type="submit" icon={faSave} isRounded kind="primary" />
           </FlexBox>
         </form>
