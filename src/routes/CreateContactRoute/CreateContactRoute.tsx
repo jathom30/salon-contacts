@@ -1,5 +1,5 @@
 import { createContact } from "api";
-import { Button, FlexBox, Input, Label } from "components";
+import { Button, FlexBox, Input, Label, Loader } from "components";
 import React, { FormEvent, useState } from "react";
 import { useMutation } from "react-query";
 import { useNavigate } from "react-router-dom";
@@ -69,6 +69,9 @@ export const CreateContactRoute = () => {
           <Button type="submit" kind="primary" isDisabled={disabled}>Submit</Button>
         </FlexBox>
       </form>
+      {createContactMutation.isLoading && (
+        <div className="CreateContactRoute__loader"><Loader size="l" /></div>
+      )}
     </div>
   )
 }

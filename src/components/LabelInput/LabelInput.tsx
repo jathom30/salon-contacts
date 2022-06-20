@@ -10,6 +10,7 @@ type LabelInputType = {
   onSubmit: (val: string | number) => string | void;
   onChange?: (val: string) => string;
   isDisabled?: boolean;
+  placeholder?: string
   children?: ReactNode;
 }
 
@@ -19,6 +20,7 @@ export const LabelInput: React.FC<LabelInputType> = ({
   onSubmit,
   onChange,
   isDisabled = false,
+  placeholder,
   children
 }) => {
   const [input, setInput] = useState(value);
@@ -84,6 +86,7 @@ export const LabelInput: React.FC<LabelInputType> = ({
             type={typeof value === 'number' ? 'number' : 'text'}
             step={0.01}
             onKeyDown={handleKeyPress}
+            placeholder={placeholder}
           />
           <Button onClick={handleCancel} isRounded>
             <FontAwesomeIcon icon={faTimes} />

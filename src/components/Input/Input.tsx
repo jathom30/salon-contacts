@@ -3,13 +3,14 @@ import React, { KeyboardEvent, ReactNode } from 'react';
 import './Input.scss'
 
 export const Input: React.FC<{
-  label: ReactNode;
+  label?: ReactNode;
   value: string | number;
   onChange: (val: string) => void;
+  placeholder?: string;
   name: string;
   step?: number
   required?: boolean
-}> = ({label, value, onChange, name, step, required = false}) => {
+}> = ({label, value, onChange, name, step, required = false, placeholder}) => {
   const type = typeof value === 'string' ? 'string' : 'number'
 
   const handleKeyPress = (e: KeyboardEvent<HTMLInputElement>) => {
@@ -29,10 +30,11 @@ export const Input: React.FC<{
 
   return (
     <label className='Input' htmlFor={name}>
-      <Label required={required}>{label}</Label>
+      {label && <Label required={required}>{label}</Label>}
       <div className="Input__container">
         <input
           className='Input__input'
+          placeholder={placeholder}
           type={type}
           name={name}
           value={value}

@@ -6,7 +6,7 @@ import './Button.scss'
 
 export const Button: React.FC<{
   buttonRef?: React.RefObject<HTMLButtonElement>
-  onClick?: () => void,
+  onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void,
   isRounded?: boolean,
   isDisabled?: boolean
   type?: 'button' | 'submit' | 'reset'

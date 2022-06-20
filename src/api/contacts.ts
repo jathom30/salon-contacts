@@ -18,7 +18,11 @@ export const createContact = (contact: Omit<Contact, 'id'>) => {
 
 export const updateContact = (contact: Contact) => {
   const {id, ...fields} = contact
-  return contactsBase.update([{id, fields: fields as unknown as FieldSet}])
+  const jsonFields = {
+    ...fields,
+    notes: JSON.stringify(fields.notes) || ''
+  }
+  return contactsBase.update([{id, fields: jsonFields as unknown as FieldSet}])
 }
 
 export const deleteContact = (id: string) => contactsBase.destroy(id)

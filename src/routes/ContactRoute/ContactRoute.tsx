@@ -1,75 +1,239 @@
-import React, { useState } from "react";
-import { getContact } from "api";
-import { Button, FlexBox } from "components";
-import { useQuery } from "react-query";
-import { useParams } from "react-router-dom";
+import React, { FormEvent, MouseEvent, useRef, useState } from "react";
+import { deleteContact, getContact, updateContact } from "api";
+import { Button, FlexBox, Input, LabelInput, Loader } from "components";
+import { useMutation, useQuery } from "react-query";
+import { useNavigate, useParams } from "react-router-dom";
 import { Contact, Note } from "typings";
 import './ContactRoute.scss'
-import { faPencil, faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faPencil, faPlus, faSave, faTimes, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { useOnClickOutside, useValidatedMask } from "hooks";
 
 export const ContactRoute = () => {
   const { id } = useParams()
-  const [showAllNotes, setShowAllNotes] = useState(false)
-  const [contact, setContact] = useState<Contact>()
+  const [showNewNote, setShowNewNote] = useState(false)
+  const [note, setNote] = useState('')
+  const navigate = useNavigate()
+  const newNoteRef = useRef<HTMLTextAreaElement>(null)
+
+  useOnClickOutside(newNoteRef, () => {
+    setShowNewNote(false)
+    setNote('')
+  })
 
   const contactQuery = useQuery(
     ['contact', id],
     () => getContact(id || ''),
-    { 
-      enabled: !!id,
-      onSuccess(data) {
-        const tempContact = data.fields as unknown as Contact
-        const parsedNotes = JSON.parse(data.fields.notes as string)
-        setContact({
-          ...tempContact,
-          notes: parsedNotes
-        })
-      },
-    }
+    { enabled: !!id }
   )
+
+  const contact = contactQuery.data?.fields as unknown as Contact | undefined
+  const notes = contactQuery.data?.fields.notes ? JSON.parse(contactQuery.data?.fields.notes as string) as Note[] | undefined : []
+
+  const updateContactMutation = useMutation(updateContact, {
+    onSuccess: () => {
+      contactQuery.refetch()
+    }
+  })
+
+  const updateContactNotes = (newNote: Note) => {
+    if (!contact) { return }
+
+    const newNotes = [
+      newNote,
+      ...(notes || [])
+    ]
+
+    updateContactMutation.mutate({
+      ...contact,
+      notes: newNotes
+    })
+  }
+
+
+  const handleSave = () => {
+    setShowNewNote(false)
+    if (!note) { return }
+    const today = new Date()
+    updateContactNotes({
+      date: today.toString(),
+      details: note
+    })
+    setNote('')
+  }
+
+  const handleNoteDelete = (index: number) => {
+    if (!contact) { return }
+    const newNotes = notes ? [...notes?.slice(0, index), ...notes?.slice(index + 1)] : []
+    updateContactMutation.mutate({
+      ...contact,
+      notes: newNotes
+    })
+  }
+
+  const handleSaveNote = (noteDetail: string, index: number) => {
+    if (!contact || !notes) { return }
+    const newNote: Note = {
+      ...notes[index],
+      details: noteDetail
+    }
+    const newNotes = [...notes?.slice(0, index), newNote, ...notes.slice(index + 1)]
+    updateContactMutation.mutate({
+      ...contact,
+      notes: newNotes
+    })
+  }
+
+  const handleUpdateDetails = (detail: string, field: 'name' | 'phone_number' | 'email') => {
+    if (!contact || !notes) { return }
+    const newContact = {
+      ...contact,
+      notes,
+      [field]: detail
+    }
+    updateContactMutation.mutate(newContact)
+  }
+
+  const deleteContactMutation = useMutation(deleteContact, {
+    onSuccess: () => { navigate("/") }
+  })
+
+  const handleDeleteContact = (e: MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation()
+    deleteContactMutation.mutate(id || '')
+  }
 
   return (
     <div className="ContactRoute">
       {contactQuery.isLoading ? (
-        <div>Loading...</div>
+        <Loader size="l" />
       ) : (
         <>
-          <FlexBox flexDirection="column">
-            <h1>{contact?.name}</h1>
-            <span>{contact?.phone_number}</span>
-            <span>{contact?.email}</span>
+          <FlexBox flexDirection="column" gap=".25rem">
+            <LabelInput value={contact?.name || ''} onSubmit={val => handleUpdateDetails(val as string, 'name')}>
+              <div style={{width: '100%'}}>
+                <FlexBox alignItems="center" justifyContent="space-between" gap="0.5rem">
+                  <h1>{contact?.name}</h1>
+                  <Button isRounded icon={faTrash} onClick={handleDeleteContact} kind="danger" />
+                </FlexBox>
+              </div>
+            </LabelInput>
+            {contact?.phone_number ? (
+              <LabelInput value={contact.phone_number || ''} onSubmit={val => handleUpdateDetails(val as string, 'phone_number')} placeholder="Add phone number">
+                <span>{contact.phone_number}</span>
+              </LabelInput>
+            ) : (
+              <AddField label="Add phone number" onSubmit={(val) => handleUpdateDetails(val, 'phone_number')} validation="phone-number" />
+            )}
+            {contact?.email ? (
+              <LabelInput value={contact?.email || ''} onSubmit={val => handleUpdateDetails(val as string, 'email')} placeholder="Add email">
+                <span>{contact?.email}</span>
+              </LabelInput>
+            ) : (
+              <AddField label="Add email" onSubmit={(val) => handleUpdateDetails(val, 'email')} validation="email" />
+            )}
           </FlexBox>
-          <h5>Notes</h5>
-          {contact?.notes?.map((note, i) => (
-            <NoteBox key={i} note={note} />
-          ))}
-          {/* <div className="ContactRoute__notes">
-            <FlexBox alignItems="center" justifyContent="space-between">
-              <h3>Most recent</h3>
-              <Button kind="secondary" icon={faPlus}>New Note</Button>
+          <FlexBox alignItems="center" justifyContent="space-between">
+            <h5>Notes</h5>
+            <FlexBox gap=".5rem">
+              {showNewNote && <Button isRounded icon={faTimes} onClick={() => {setShowNewNote(false); setNote('')}} />}
+              <Button isRounded icon={showNewNote ? faSave : faPlus} kind={showNewNote ? 'primary' : 'default'} onClick={() => showNewNote ? handleSave() : setShowNewNote(true)} />
             </FlexBox>
-            <Button onClick={() => setShowAllNotes(!showAllNotes)}>{showAllNotes ? 'Collapse' : 'View All'}</Button>
-          </div> */}
+          </FlexBox>
+          {showNewNote && (
+            <textarea ref={newNoteRef} rows={10} value={note} onChange={e => setNote(e.target.value)} />
+          )}
+          {notes?.map((note, i) => (
+            <NoteBox
+              key={i}
+              note={note}
+              onDelete={() => handleNoteDelete(i)}
+              onChange={detail => handleSaveNote(detail, i)}
+              canDelete={notes.length > 1}
+            />
+          ))}
         </>
       )}
+      {updateContactMutation.isLoading && <div className="ContactRoute__loader"><Loader size="l" /></div>}
     </div>
   )
 }
 
-const NoteBox = ({note}: {note: Note}) => {
+const NoteBox = ({note, onDelete, onChange, canDelete}: {note: Note, onDelete: () => void, onChange: (noteDetails: string) => void, canDelete: boolean}) => {
+  const [edit, setEdit] = useState(false)
+  const [details, setDetails] = useState(note.details)
+  const noteRef = useRef<HTMLTextAreaElement>(null)
+
+  useOnClickOutside(noteRef, () => {
+    setEdit(false)
+    setDetails(note.details)
+  })
 
   const date = new Date(note.date).toDateString()
+
+  const handleSave = () => {
+    setEdit(false)
+    onChange(details)
+  }
+
+  const handleCancel = () => {
+    setDetails(note.details)
+    setEdit(false)
+  }
+
 
   return (
     <div className="Note">
       <FlexBox gap="1rem" alignItems="center" justifyContent="space-between">
         <span className="Note__date">{date}</span>
         <FlexBox gap=".25rem" alignSelf="flex-end">
-          <Button isRounded kind="secondary" icon={faPencil} />
-          <Button isRounded kind="danger" icon={faTrash} />
+          <Button isRounded kind={edit ? "default" : "secondary"} icon={edit ? faTimes : faPencil} onClick={() => edit ? handleCancel() : setEdit(true)} />
+          <Button isDisabled={!canDelete} isRounded kind="danger" icon={faTrash} onClick={onDelete} />
         </FlexBox>
       </FlexBox>
-      <p>{note.details}</p>
+      {edit ? (
+        <>
+          <textarea ref={noteRef} rows={10} value={details} onChange={e => setDetails(e.target.value)} />
+          <Button kind="primary" icon={faSave} onClick={handleSave}>Save note</Button>
+        </>
+      ) : (
+        <p>{note.details}</p>
+      )}
     </div>
+  )
+}
+
+const AddField = ({label, onSubmit, validation}: {label: string; onSubmit: (newVal: string) => void; validation: 'phone-number' | 'email'}) => { 
+  const [showInput, setShowInput] = useState(false)
+  const [value, setValue, isValid] = useValidatedMask({
+    initialState: '',
+    validation,
+    mask: validation === 'phone-number' ? 'phone-number' : (val) => val
+  })
+  const formRef = useRef<HTMLFormElement>(null)
+
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    onSubmit(value)
+    setShowInput(false)
+  }
+
+  useOnClickOutside(formRef, () => setShowInput(false))
+
+  if (showInput) {
+    return (
+      <div className="AddField">
+        <form ref={formRef} onSubmit={handleSubmit}>
+          <FlexBox gap="1rem">
+            <Input name={label} value={value} onChange={setValue} placeholder={label} />
+            {!isValid && <span className="AddField__warning">Not a valid {validation}</span>}
+            <Button type="submit" icon={faSave} isRounded kind="primary" />
+          </FlexBox>
+        </form>
+      </div>
+
+    )
+  }
+  return (
+    <Button icon={faPlus} onClick={() => setShowInput(true)}>{label}</Button>
   )
 }
