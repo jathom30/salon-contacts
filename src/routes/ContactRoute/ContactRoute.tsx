@@ -145,7 +145,7 @@ export const ContactRoute = () => {
           )}
           {notes?.map((note, i) => (
             <NoteBox
-              key={i}
+              key={note.date}
               note={note}
               onDelete={() => handleNoteDelete(i)}
               onChange={detail => handleSaveNote(detail, i)}
