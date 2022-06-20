@@ -154,7 +154,7 @@ export const ContactRoute = () => {
           ))}
         </>
       )}
-      {updateContactMutation.isLoading && <div className="ContactRoute__loader"><Loader size="l" /></div>}
+      {(updateContactMutation.isLoading || contactQuery.isRefetching) && <div className="ContactRoute__loader"><Loader size="l" /></div>}
     </div>
   )
 }
