@@ -14,7 +14,7 @@ export const Header = () => {
   return (
     <div className="Header">
       <Link to="/">
-        <h3>Header</h3>
+        <h3>Melody's Recipes</h3>
       </Link>
       <Button icon={faPlus} kind="primary" onClick={handleCreateNew}>New Contact</Button>
     </div>

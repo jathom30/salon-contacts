@@ -14,8 +14,9 @@ export const ContactRoute = () => {
   const [note, setNote] = useState('')
   const navigate = useNavigate()
   const newNoteRef = useRef<HTMLTextAreaElement>(null)
+  const saveNoteRef = useRef<HTMLButtonElement>(null)
 
-  useOnClickOutside(newNoteRef, () => {
+  useOnClickOutside([newNoteRef, saveNoteRef], () => {
     setShowNewNote(false)
     setNote('')
   })
@@ -136,7 +137,7 @@ export const ContactRoute = () => {
             <h5>Notes</h5>
             <FlexBox gap=".5rem">
               {showNewNote && <Button isRounded icon={faTimes} onClick={() => {setShowNewNote(false); setNote('')}} />}
-              <Button isRounded icon={showNewNote ? faSave : faPlus} kind={showNewNote ? 'primary' : 'default'} onClick={() => showNewNote ? handleSave() : setShowNewNote(true)} />
+              <Button buttonRef={saveNoteRef} isRounded icon={showNewNote ? faSave : faPlus} kind={showNewNote ? 'primary' : 'default'} onClick={() => showNewNote ? handleSave() : setShowNewNote(true)} />
             </FlexBox>
           </FlexBox>
           {showNewNote && (
@@ -162,8 +163,10 @@ const NoteBox = ({note, onDelete, onChange, canDelete}: {note: Note, onDelete: (
   const [edit, setEdit] = useState(false)
   const [details, setDetails] = useState(note.details)
   const noteRef = useRef<HTMLTextAreaElement>(null)
+  const cancelButtonRef = useRef<HTMLButtonElement>(null)
+  const saveButtonRef = useRef<HTMLButtonElement>(null)
 
-  useOnClickOutside(noteRef, () => {
+  useOnClickOutside([noteRef, cancelButtonRef, saveButtonRef], () => {
     setEdit(false)
     setDetails(note.details)
   })
@@ -186,14 +189,14 @@ const NoteBox = ({note, onDelete, onChange, canDelete}: {note: Note, onDelete: (
       <FlexBox gap="1rem" alignItems="center" justifyContent="space-between">
         <span className="Note__date">{date}</span>
         <FlexBox gap=".25rem" alignSelf="flex-end">
-          <Button isRounded kind={edit ? "default" : "secondary"} icon={edit ? faTimes : faPencil} onClick={() => edit ? handleCancel() : setEdit(true)} />
+          <Button buttonRef={cancelButtonRef} isRounded kind={edit ? "default" : "secondary"} icon={edit ? faTimes : faPencil} onClick={() => edit ? handleCancel() : setEdit(true)} />
           <Button isDisabled={!canDelete} isRounded kind="danger" icon={faTrash} onClick={onDelete} />
         </FlexBox>
       </FlexBox>
       {edit ? (
         <>
           <textarea ref={noteRef} rows={10} value={details} onChange={e => setDetails(e.target.value)} />
-          <Button kind="primary" icon={faSave} onClick={handleSave}>Save note</Button>
+          <Button buttonRef={saveButtonRef} kind="primary" icon={faSave} onClick={handleSave}>Save note</Button>
         </>
       ) : (
         <p>{note.details}</p>
