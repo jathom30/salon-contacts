@@ -19,8 +19,8 @@ export const Header = () => {
         <h3>Melody's Recipes</h3>
       </Link>
       <FlexBox gap="1rem">
-        <Button icon={faPlus} kind="primary" onClick={handleCreateNew}>New Contact</Button>
-        <Button icon={faSignOut} kind="secondary" onClick={logoutUser} />
+        <Button icon={faPlus} kind="primary" isRounded onClick={handleCreateNew} />
+        <Button icon={faSignOut} kind="secondary" isRounded onClick={logoutUser} />
       </FlexBox>
     </div>
   )
