@@ -1,7 +1,7 @@
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { getContacts } from "api";
-import { FlexBox, Input } from "components";
+import { FlexBox, Input, Loader } from "components";
 import React, { useState } from "react";
 import { useQuery } from "react-query";
 import { Link } from "react-router-dom";
@@ -29,6 +29,7 @@ export const ContactListRoute = () => {
           <Input value={search} onChange={setSearch} name="search" />
         </FlexBox>
       </div>
+      {contactsQuery.isLoading && <Loader size="l" />}
       {sortedContacts?.map(contact => (
         <Link className="ContactListRoute__contact" key={contact.id} to={contact.id}>{contact.name}</Link>
       ))}
