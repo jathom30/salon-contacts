@@ -1,0 +1,28 @@
+.NoteBox {
+  border-radius: .25rem;
+  background: var(--color-component-background);
+  box-shadow: var(--box-shadow);
+  padding: .5rem;
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+  &__date {
+    font-size: .75rem;
+    color: var(--color-text-subdued);
+  }
+  &__text-btn {
+    border: none;
+    background: transparent;
+    text-align: left;
+    font-size: inherit;
+    cursor: pointer;
+    border-radius: .25rem;
+    padding: .5rem;
+    &:hover {
+      background: var(--color-component-background-alt);
+    }
+  }
+  &__note-strand {
+    min-height: 1rem;
+  }
+}

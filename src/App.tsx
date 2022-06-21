@@ -31,7 +31,7 @@ function App() {
     <div className="App">
       <MaxHeightContainer
         fullHeight
-        header={(isLoggedIn) && <Header />}
+        header={isLoggedIn && <Header />}
       >
         <Routes>
           <Route path="/" element={
@@ -44,7 +44,6 @@ function App() {
               <CreateContactRoute />
             </ProtectedRoute>
           } />
-          {/* <Route path="/login" element={<LoginRoute />} /> */}
           <Route path="/:id" element={
             <ProtectedRoute>
               <ContactRoute />
@@ -58,8 +57,3 @@ function App() {
 }
 
 export default App;
-
-// ! TODO
-// Auth
-// push to github
-// deploy

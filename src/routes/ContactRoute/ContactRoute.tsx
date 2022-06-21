@@ -1,30 +1,36 @@
-import React, { FormEvent, MouseEvent, useRef, useState } from "react";
+import React, { MouseEvent, useRef, useState } from "react";
 import { deleteContact, getContact, updateContact } from "api";
-import { Button, FlexBox, Input, LabelInput, Loader } from "components";
-import { useMutation, useQuery } from "react-query";
+import { AddField, Button, DeleteWarning, FlexBox, LabelInput, Loader, Modal, NoteBox } from "components";
+import { useMutation, useQuery, useQueryClient } from "react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import { Contact, Note } from "typings";
 import './ContactRoute.scss'
-import { faPencil, faPlus, faSave, faTimes, faTrash } from "@fortawesome/free-solid-svg-icons";
-import { useOnClickOutside, useValidatedMask } from "hooks";
+import { faPlus, faSave, faTimes, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { useOnClickOutside } from "hooks";
 import { maskingFuncs } from "hooks/useMask/maskingFuncs";
+import { FieldSet, Record } from "airtable";
 
 export const ContactRoute = () => {
   const { id } = useParams()
   const [showNewNote, setShowNewNote] = useState(false)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [note, setNote] = useState('')
   const navigate = useNavigate()
   const newNoteRef = useRef<HTMLTextAreaElement>(null)
   const saveNoteRef = useRef<HTMLButtonElement>(null)
+
+  const queryClient = useQueryClient()
 
   
   useOnClickOutside([newNoteRef, saveNoteRef], () => {
     setShowNewNote(false)
     setNote('')
   })
+
+  const CONTACT_QUERY_KEY = ['contact', id]
   
   const contactQuery = useQuery(
-    ['contact', id],
+    CONTACT_QUERY_KEY,
     () => getContact(id || ''),
     { enabled: !!id }
     )
@@ -33,8 +39,28 @@ export const ContactRoute = () => {
   const notes = contactQuery.data?.fields.notes ? JSON.parse(contactQuery.data?.fields.notes as string) as Note[] | undefined : []
   
   const updateContactMutation = useMutation(updateContact, {
-    onSuccess: () => {
-      contactQuery.refetch()
+    onMutate: async (newContact) => {
+      await queryClient.cancelQueries(CONTACT_QUERY_KEY)
+
+      const prevContact = queryClient.getQueryData<Record<FieldSet>>(CONTACT_QUERY_KEY)
+
+      if (prevContact) {
+        const parsedNewContact = {
+          ...newContact,
+          notes: JSON.stringify(newContact.notes)
+        }
+        queryClient.setQueryData(CONTACT_QUERY_KEY, {
+          ...prevContact,
+          fields: {
+            ...prevContact?.fields,
+            ...parsedNewContact
+          }
+        })
+      }
+      return { prevContact }
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries(CONTACT_QUERY_KEY)
     }
   })
 
@@ -111,12 +137,12 @@ export const ContactRoute = () => {
         <Loader size="l" />
       ) : (
         <>
-          <FlexBox flexDirection="column" gap=".25rem">
+          <FlexBox flexDirection="column">
             <FlexBox alignItems="center" justifyContent="space-between" gap="0.5rem">
               <LabelInput value={contact?.name || ''} onSubmit={val => handleUpdateDetails(val as string, 'name')}>
                 <h1>{contact?.name}</h1>
               </LabelInput>
-              <Button isRounded icon={faTrash} onClick={handleDeleteContact} kind="danger" />
+              <Button isRounded icon={faTrash} onClick={() => setShowDeleteModal(true)} kind="danger" />
             </FlexBox>
             {contact?.phone_number ? (
               <LabelInput value={contact.phone_number || ''} onChange={maskingFuncs["phone-number"]} onSubmit={val => handleUpdateDetails(val as string, 'phone_number')} placeholder="Add phone number">
@@ -154,91 +180,19 @@ export const ContactRoute = () => {
           ))}
         </>
       )}
-      {(updateContactMutation.isLoading || contactQuery.isRefetching) && <div className="ContactRoute__loader"><Loader size="l" /></div>}
-    </div>
-  )
-}
-
-const NoteBox = ({note, onDelete, onChange, canDelete}: {note: Note, onDelete: () => void, onChange: (noteDetails: string) => void, canDelete: boolean}) => {
-  const [edit, setEdit] = useState(false)
-  const [details, setDetails] = useState(note.details)
-  const noteRef = useRef<HTMLTextAreaElement>(null)
-  const cancelButtonRef = useRef<HTMLButtonElement>(null)
-  const saveButtonRef = useRef<HTMLButtonElement>(null)
-
-  useOnClickOutside([noteRef, cancelButtonRef, saveButtonRef], () => {
-    setEdit(false)
-    setDetails(note.details)
-  })
-
-  const date = new Date(note.date).toDateString()
-
-  const handleSave = () => {
-    setEdit(false)
-    onChange(details)
-  }
-
-  const handleCancel = () => {
-    setDetails(note.details)
-    setEdit(false)
-  }
-
-  const splitNote = note.details.split('\n')
-
-  return (
-    <div className="Note">
-      <FlexBox gap="1rem" alignItems="center" justifyContent="space-between">
-        <span className="Note__date">{date}</span>
-        <FlexBox gap=".25rem" alignSelf="flex-end">
-          <Button buttonRef={cancelButtonRef} isRounded kind={edit ? "default" : "secondary"} icon={edit ? faTimes : faPencil} onClick={() => edit ? handleCancel() : setEdit(true)} />
-          <Button isDisabled={!canDelete} isRounded kind="danger" icon={faTrash} onClick={onDelete} />
-        </FlexBox>
-      </FlexBox>
-      {edit ? (
-        <>
-          <textarea ref={noteRef} rows={10} value={details} onChange={e => setDetails(e.target.value)} />
-          <Button buttonRef={saveButtonRef} kind="primary" icon={faSave} onClick={handleSave}>Save note</Button>
-        </>
-      ) : (
-        splitNote.map((split, i) => (
-          <p key={i}>{split}</p>
-        ))
+      {showDeleteModal && (
+        <Modal offClick={() => setShowDeleteModal(false)}>
+          <DeleteWarning
+            onClose={() => setShowDeleteModal(false)}
+            onDelete={handleDeleteContact}
+            isLoading={deleteContactMutation.isLoading}
+          >
+            <span>
+              Contact information for <strong>{contact?.name}</strong> cannot be recovered once deleted.
+            </span>
+          </DeleteWarning>
+        </Modal>
       )}
     </div>
-  )
-}
-
-const AddField = ({label, onSubmit, validation}: {label: string; onSubmit: (newVal: string) => void; validation: 'phone-number' | 'email'}) => { 
-  const [showInput, setShowInput] = useState(false)
-  const [value, setValue, isValid] = useValidatedMask({
-    initialState: '',
-    validation,
-    mask: validation === 'phone-number' ? 'phone-number' : (val) => val
-  })
-  const formRef = useRef<HTMLFormElement>(null)
-
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    onSubmit(value)
-    setShowInput(false)
-  }
-
-  useOnClickOutside(formRef, () => setShowInput(false))
-
-  if (showInput) {
-    return (
-      <div className="AddField">
-        <form ref={formRef} onSubmit={handleSubmit}>
-          <FlexBox gap="1rem">
-            <Input name={label} value={value} onChange={setValue} placeholder={label} hasError={!isValid} />
-            <Button type="submit" icon={faSave} isRounded kind="primary" />
-          </FlexBox>
-        </form>
-      </div>
-
-    )
-  }
-  return (
-    <Button icon={faPlus} onClick={() => setShowInput(true)}>{label}</Button>
   )
 }
