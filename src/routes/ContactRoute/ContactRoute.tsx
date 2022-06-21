@@ -1,6 +1,6 @@
 import React, { MouseEvent, useRef, useState } from "react";
 import { deleteContact, getContact, updateContact } from "api";
-import { AddField, Button, DeleteWarning, FlexBox, LabelInput, Loader, Modal, NoteBox } from "components";
+import { AddField, Button, DeleteWarning, FlexBox, Label, LabelInput, Loader, MaxHeightContainer, Modal, NoteBox } from "components";
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import { Contact, Note } from "typings";
@@ -131,55 +131,73 @@ export const ContactRoute = () => {
     deleteContactMutation.mutate(id || '')
   }
 
+  if (contactQuery.isLoading) {
+    return (
+      <div className="ContactRoute">
+        <div className="ContactRoute__loader">
+          <Loader />
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="ContactRoute">
-      {contactQuery.isLoading ? (
-        <Loader size="l" />
-      ) : (
-        <>
-          <FlexBox flexDirection="column">
-            <FlexBox alignItems="center" justifyContent="space-between" gap="0.5rem">
+      <MaxHeightContainer
+        header={
+          <div className="ContactRoute__header">
+            <FlexBox alignItems="center" justifyContent="space-between" gap="0.5rem" padding="1rem">
               <LabelInput value={contact?.name || ''} onSubmit={val => handleUpdateDetails(val as string, 'name')}>
                 <h1>{contact?.name}</h1>
               </LabelInput>
               <Button isRounded icon={faTrash} onClick={() => setShowDeleteModal(true)} kind="danger" />
             </FlexBox>
-            {contact?.phone_number ? (
-              <LabelInput value={contact.phone_number || ''} onChange={maskingFuncs["phone-number"]} onSubmit={val => handleUpdateDetails(val as string, 'phone_number')} placeholder="Add phone number">
-                <span>{contact.phone_number}</span>
-              </LabelInput>
-            ) : (
-              <AddField label="Add phone number" onSubmit={(val) => handleUpdateDetails(val, 'phone_number')} validation="phone-number" />
-            )}
-            {contact?.email ? (
-              <LabelInput value={contact?.email || ''} onSubmit={val => handleUpdateDetails(val as string, 'email')} placeholder="Add email">
-                <span>{contact?.email}</span>
-              </LabelInput>
-            ) : (
-              <AddField label="Add email" onSubmit={(val) => handleUpdateDetails(val, 'email')} validation="email" />
-            )}
-          </FlexBox>
-          <FlexBox alignItems="center" justifyContent="space-between">
-            <h5>Notes</h5>
-            <FlexBox gap=".5rem">
-              {showNewNote && <Button isRounded icon={faTimes} onClick={() => {setShowNewNote(false); setNote('')}} />}
-              <Button buttonRef={saveNoteRef} isRounded icon={showNewNote ? faSave : faPlus} kind={showNewNote ? 'primary' : 'default'} onClick={() => showNewNote ? handleSave() : setShowNewNote(true)} />
+          </div>
+        }
+      >
+        <FlexBox padding="1rem" flexDirection="column" gap="1rem">
+          <FlexBox flexDirection="column" gap=".5rem">
+            <Label>Details</Label>
+            <FlexBox flexDirection="column" gap="0.25rem">
+              {contact?.phone_number ? (
+                <LabelInput value={contact.phone_number || ''} onChange={maskingFuncs["phone-number"]} onSubmit={val => handleUpdateDetails(val as string, 'phone_number')} placeholder="Add phone number">
+                  <span>{contact.phone_number}</span>
+                </LabelInput>
+              ) : (
+                <AddField label="Add phone number" onSubmit={(val) => handleUpdateDetails(val, 'phone_number')} validation="phone-number" />
+              )}
+              {contact?.email ? (
+                <LabelInput value={contact?.email || ''} onSubmit={val => handleUpdateDetails(val as string, 'email')} placeholder="Add email">
+                  <span>{contact?.email}</span>
+                </LabelInput>
+              ) : (
+                <AddField label="Add email" onSubmit={(val) => handleUpdateDetails(val, 'email')} validation="email" />
+              )}
             </FlexBox>
           </FlexBox>
-          {showNewNote && (
-            <textarea ref={newNoteRef} rows={10} value={note} onChange={e => setNote(e.target.value)} />
-          )}
-          {notes?.map((note, i) => (
-            <NoteBox
-              key={note.date}
-              note={note}
-              onDelete={() => handleNoteDelete(i)}
-              onChange={detail => handleSaveNote(detail, i)}
-              canDelete={notes.length > 1}
-            />
-          ))}
-        </>
-      )}
+          <FlexBox flexDirection="column" gap="1rem">
+            <FlexBox alignItems="flex-end" justifyContent="space-between">
+              <Label>Notes</Label>
+              <FlexBox gap=".5rem">
+                {showNewNote && <Button isRounded icon={faTimes} onClick={() => {setShowNewNote(false); setNote('')}} />}
+                <Button buttonRef={saveNoteRef} isRounded icon={showNewNote ? faSave : faPlus} kind={showNewNote ? 'primary' : 'default'} onClick={() => showNewNote ? handleSave() : setShowNewNote(true)} />
+              </FlexBox>
+            </FlexBox>
+            {showNewNote && (
+              <textarea ref={newNoteRef} rows={10} value={note} onChange={e => setNote(e.target.value)} />
+            )}
+            {notes?.map((note, i) => (
+              <NoteBox
+                key={note.date}
+                note={note}
+                onDelete={() => handleNoteDelete(i)}
+                onChange={detail => handleSaveNote(detail, i)}
+                canDelete={notes.length > 1}
+              />
+            ))}
+          </FlexBox>
+        </FlexBox>
+      </MaxHeightContainer>
       {showDeleteModal && (
         <Modal offClick={() => setShowDeleteModal(false)}>
           <DeleteWarning

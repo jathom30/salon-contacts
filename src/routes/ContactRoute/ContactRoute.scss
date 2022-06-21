@@ -1,9 +1,13 @@
 .ContactRoute {
-  padding: 1rem;
+  height: 100%;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   gap: 1rem;
   position: relative;
+  &__header {
+    border-bottom: 1px solid var(--color-component-background-darken);
+  }
   &__notes {
     background: var(--color-component-background);
     padding: 1rem;
