@@ -8,4 +8,7 @@
   gap: 1rem;
   border-bottom: 1px solid var(--color-component-background-darken);
   color: var(--color-text-subdued);
+  &__icon {
+    width: 1.5rem;
+  }
 }

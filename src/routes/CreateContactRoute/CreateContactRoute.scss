@@ -19,4 +19,9 @@
     grid-column: 1 / 1;
     grid-row: 1 / 1;
   }
+  &__loader-label {
+    span {
+      color: var(--color-primary);
+    }
+  }
 }

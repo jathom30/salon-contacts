@@ -18,10 +18,10 @@
     border-radius: 3rem;
   }
   &__primary {
-    background: var(--color-success);
-    color: var(--color-success-text);
+    background: var(--color-primary);
+    color: var(--color-primary-text);
     &:hover {
-      background-color: rgb(72, 175, 72);
+      background-color: var(--color-primary-darken);
       color: white;
     }
   }

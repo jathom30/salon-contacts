@@ -57,7 +57,7 @@ export const CreateContactRoute = () => {
           <div className="CreateContactRoute__loader-svg">
             <ContactCardsSVG />
           </div>
-          <h1 className="CreateContactRoute__loader-label">Creating {name}'s contact</h1>
+          <h1 className="CreateContactRoute__loader-label">Creating <span>{name}</span>'s contact</h1>
         </div>
       </div>
     )

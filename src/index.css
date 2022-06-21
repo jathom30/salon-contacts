@@ -6,19 +6,21 @@
   --box-shadow-hover: 0 3px 6px rgba(0, 0, 0, .5);
   --box-shadow-up: 0 -3px 6px rgba(0, 0, 0, 0.25);
 
-  --test-color: #313131;
-
   --color-background: #f3f3f3;
   --color-component-background: #ffffff;
   --color-component-background-alt: #e6e6e6;
   --color-component-background-darken: #cbcbcb;
-  --color-text: #000000;
+  --color-text: #023047;
   --color-text-subdued: #808080;
+
+  --color-primary: #FB8500;
+  --color-primary-text: #FFE7CE;
+  --color-primary-darken: #E47600;
 
   --color-success: #90ee90;
   --color-success-text: #008000;
   --color-danger: #ff4400;
-  --color-secondary: #79b6ca;
+  --color-secondary: #023047;
 }
 
 *, *:after, *:before {

@@ -1,3 +1,4 @@
+import { Chair } from "assets";
 import { Button } from "components";
 import React from "react";
 import { useIdentityContext } from "react-netlify-identity";
@@ -15,7 +16,9 @@ export const LoginRoute = () => {
 
   return (
     <div className="LoginRoute">
-      <Button kind="primary" onClick={handleGoogleAuth}>Login</Button>
+      <Chair />
+      <h1>Melody's Recipes</h1>
+      <Button kind="primary" onClick={handleGoogleAuth} width="10rem">Login</Button>
     </div>
   )
 }
