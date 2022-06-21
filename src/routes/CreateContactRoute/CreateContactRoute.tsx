@@ -1,11 +1,13 @@
-import { createContact } from "api";
-import { Button, FlexBox, Input, Label, Loader } from "components";
-import { useValidatedMask, useValidatedState } from "hooks";
 import React, { FormEvent, useState } from "react";
+import { createContact } from "api";
+import { ContactCardsSVG } from "assets";
+import { Button, FlexBox, Input, Label } from "components";
+import { useValidatedMask, useValidatedState } from "hooks";
 import { useMutation } from "react-query";
 import { useNavigate } from "react-router-dom";
 import { Contact, Note } from "typings";
 import './CreateContactRoute.scss'
+import { FieldSet, Record } from "airtable";
 
 export const CreateContactRoute = () => {
   const [name, setName] = useState('')
@@ -18,8 +20,15 @@ export const CreateContactRoute = () => {
 
   const navigate = useNavigate()
 
-  const createContactMutation = useMutation(createContact, {
-    onSuccess: (data) => {
+  const createContactMutation = useMutation((newContact: Omit<Contact, 'id'>) => {
+    const delayedResponse = new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(createContact(newContact));
+      }, 2000);
+    });
+    return delayedResponse as Promise<Record<FieldSet>[]>
+  }, {
+    onSuccess: (data: Record<FieldSet>[]) => {
       navigate(`/${data[0].id}`)
     }
   })
@@ -40,6 +49,19 @@ export const CreateContactRoute = () => {
   }
 
   const disabled = !!(!name || !note)
+
+  if (createContactMutation.isLoading) {
+    return (
+      <div className="CreateContactRoute">
+        <div className="CreateContactRoute__loader">
+          <div className="CreateContactRoute__loader-svg">
+            <ContactCardsSVG />
+          </div>
+          <h1 className="CreateContactRoute__loader-label">Creating {name}'s contact</h1>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="CreateContactRoute">
@@ -76,9 +98,6 @@ export const CreateContactRoute = () => {
           <Button type="submit" kind="primary" isDisabled={disabled}>Submit</Button>
         </FlexBox>
       </form>
-      {createContactMutation.isLoading && (
-        <div className="CreateContactRoute__loader"><Loader size="l" /></div>
-      )}
     </div>
   )
 }

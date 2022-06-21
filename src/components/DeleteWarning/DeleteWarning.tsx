@@ -14,7 +14,7 @@ export const DeleteWarning = ({children, onClose, onDelete, isLoading = false}: 
         </FlexBox>
         {children}
         <FlexBox justifyContent="flex-end" gap=".5rem">
-          <Button kind="text" onClick={onClose}>Cancel</Button>
+          {!isLoading && <Button kind="text" onClick={onClose}>Cancel</Button>}
           <Button kind="danger" onClick={onDelete} isDisabled={isLoading}>{!isLoading ? 'Delete' : <Loader />}</Button>
         </FlexBox>
       </FlexBox>
