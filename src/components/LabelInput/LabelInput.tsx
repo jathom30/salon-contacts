@@ -3,6 +3,7 @@ import { faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Button } from 'components';
 import  './LabelInput.scss';
+import { useOnClickOutside } from 'hooks';
 
 type LabelInputType = {
   value: string | number;
@@ -27,29 +28,32 @@ export const LabelInput: React.FC<LabelInputType> = ({
   const [isEditing, setIsEditing] = useState(false);
   const [displayHeight, setDisplayHeight] = useState<number>();
   const displayRef = useRef<HTMLButtonElement>(null);
+  const saveBtnRef = useRef<HTMLButtonElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-
+  
   // if input changes externally after render
   useEffect(() => {
     setInput(value)
   }, [value])
-
+  
   // set display height so page doesn't adjust if input height is smaller than the display height
   useEffect(() => {
     setDisplayHeight(displayRef.current?.clientHeight);
   }, []);
-
+  
   // when the user clicks to edit, input should immediately focus
   useEffect(() => {
     if (isEditing) {
       inputRef.current?.focus();
     }
   }, [isEditing]);
-
+  
   const handleCancel = () => {
     setIsEditing(false);
     setInput(value);
   };
+
+  useOnClickOutside([inputRef, saveBtnRef], handleCancel)
 
   const handleSubmit = () => {
     setInput(onSubmit(input) || input);
@@ -92,6 +96,7 @@ export const LabelInput: React.FC<LabelInputType> = ({
             <FontAwesomeIcon icon={faTimes} />
           </Button>
           <Button
+            buttonRef={saveBtnRef}
             kind="primary"
             isRounded
             onClick={handleSubmit}>

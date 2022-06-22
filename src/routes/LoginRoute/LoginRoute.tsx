@@ -17,7 +17,9 @@ export const LoginRoute = () => {
 
   return (
     <div className="LoginRoute">
-      <Chair />
+      <div className="LoginRoute__logo">
+        <Chair />
+      </div>
       <div className="LoginRoute__content">
         <h1>Melody's Recipes</h1>
         <Button kind="primary" onClick={handleGoogleAuth} width="10rem">Login</Button>

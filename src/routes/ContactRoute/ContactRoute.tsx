@@ -1,4 +1,4 @@
-import React, { MouseEvent, useRef, useState } from "react";
+import React, { MouseEvent, useContext, useRef, useState } from "react";
 import { deleteContact, getContact, updateContact } from "api";
 import { AddField, Button, DeleteWarning, FlexBox, GridBox, Label, LabelInput, Loader, MaxHeightContainer, Modal, NoteBox, NotFound } from "components";
 import { useMutation, useQuery, useQueryClient } from "react-query";
@@ -9,6 +9,7 @@ import { faPlus, faSave, faTimes, faTrash } from "@fortawesome/free-solid-svg-ic
 import { useOnClickOutside } from "hooks";
 import { maskingFuncs } from "hooks/useMask/maskingFuncs";
 import { FieldSet, Record } from "airtable";
+import { WindowDimsContext } from "context";
 
 export const ContactRoute = () => {
   const { id } = useParams()
@@ -20,6 +21,7 @@ export const ContactRoute = () => {
   const saveNoteRef = useRef<HTMLButtonElement>(null)
 
   const queryClient = useQueryClient()
+  const {isMobileWidth} = useContext(WindowDimsContext)
 
   
   useOnClickOutside([newNoteRef, saveNoteRef], () => {
@@ -156,14 +158,17 @@ export const ContactRoute = () => {
     <div className="ContactRoute">
       <MaxHeightContainer
         header={
-          <div className="ContactRoute__header">
-            <FlexBox alignItems="center" justifyContent="space-between" gap="0.5rem">
-              <LabelInput value={contact?.name || ''} onSubmit={val => handleUpdateDetails(val as string, 'name')}>
-                <h1>{contact?.name}</h1>
-              </LabelInput>
-              <Button isRounded icon={faTrash} onClick={() => setShowDeleteModal(true)} kind="danger" />
-            </FlexBox>
-          </div>
+          <FlexBox padding={isMobileWidth ? "" : "1rem"} flexDirection="column" gap=".5rem">
+            {!isMobileWidth && <Label>Name</Label>}
+            <div className="ContactRoute__header">
+              <FlexBox alignItems="center" justifyContent="space-between" gap="0.5rem">
+                <LabelInput value={contact?.name || ''} onSubmit={val => handleUpdateDetails(val as string, 'name')}>
+                  <h1>{contact?.name}</h1>
+                </LabelInput>
+                <Button isRounded icon={faTrash} onClick={() => setShowDeleteModal(true)} kind="danger" />
+              </FlexBox>
+            </div>
+          </FlexBox>
         }
       >
         <FlexBox padding="1rem" flexDirection="column" gap="1rem">
