@@ -7,7 +7,7 @@ import './DeleteWarning.scss'
 export const DeleteWarning = ({children, onClose, onDelete, isLoading = false}: {children?: ReactNode, onClose: () => void, onDelete: (e: MouseEvent<HTMLButtonElement>) => void, isLoading?: boolean}) => {
   return (
     <div className="DeleteWarning">
-      <FlexBox padding="1rem" flexDirection="column" gap="1rem">
+      <FlexBox padding="1rem" paddingTop="2rem" flexDirection="column" gap="1rem">
         <FlexBox flexDirection="column" gap="0.5rem" alignItems="center">
           <FontAwesomeIcon size="2x" icon={faTrash} color="var(--color-danger)" />
           <h2>Are you sure?</h2>

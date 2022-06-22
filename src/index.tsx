@@ -6,6 +6,7 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { IdentityContextProvider } from "react-netlify-identity"
+import { WindowDimsContextProvider } from 'context';
 
 const queryClient = new QueryClient()
 
@@ -18,9 +19,11 @@ root.render(
   <React.StrictMode>
     <IdentityContextProvider url={url}>
       <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
+        <WindowDimsContextProvider>
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
+        </WindowDimsContextProvider>
       </QueryClientProvider>
     </IdentityContextProvider>
   </React.StrictMode>

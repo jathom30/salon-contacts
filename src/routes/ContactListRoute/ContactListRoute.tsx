@@ -23,12 +23,10 @@ export const ContactListRoute = () => {
 
   return (
     <div className="ContactListRoute">
-      <div className="ContactListRoute__search">
-        <FlexBox alignItems="center" gap="0.5rem">
-          <FontAwesomeIcon icon={faMagnifyingGlass} />
-          <Input value={search} onChange={setSearch} name="search" />
-        </FlexBox>
-      </div>
+      <FlexBox alignItems="center" gap="0.5rem" paddingBottom="1rem">
+        <FontAwesomeIcon icon={faMagnifyingGlass} />
+        <Input value={search} onChange={setSearch} name="search" placeholder="Search by name..." />
+      </FlexBox>
       {contactsQuery.isLoading && <Loader size="l" />}
       {sortedContacts?.map(contact => (
         <Link className="ContactListRoute__contact" key={contact.id} to={contact.id}>{contact.name}</Link>
