@@ -1,0 +1,22 @@
+.ImageDisplay {
+  position: relative;
+  &:hover {
+    .ImageDisplay__photo-options {
+      display: block;
+    }
+  }
+  &__image {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+  }
+  &__photo-options {
+    display: none;
+    background: var(--color-component-background);
+    padding: .5rem;
+    border-radius: 1.5rem;
+    position: absolute;
+    top: 1rem;
+    right: .5rem;
+  }
+}

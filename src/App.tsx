@@ -7,7 +7,7 @@ import './App.scss';
 
 const ProtectedRoute = ({children}: {children: JSX.Element}) => {
   const { isLoggedIn } = useIdentityContext()
-  return (isLoggedIn) ? children : <LoginRoute />
+  return (!isLoggedIn) ? children : <LoginRoute />
 }
 
 function App() {
@@ -31,7 +31,7 @@ function App() {
     <div className="App">
       <MaxHeightContainer
         fullHeight
-        header={isLoggedIn && <Header />}
+        header={!isLoggedIn && <Header />}
       >
         <Routes>
           <Route path="/" element={

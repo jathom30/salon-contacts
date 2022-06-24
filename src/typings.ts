@@ -2,6 +2,7 @@
 export type Note = {
   date: string
   details: string
+  image?: string
 }
 
 export type Contact = {

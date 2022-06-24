@@ -1,14 +1,13 @@
 import React, { MouseEvent, useContext, useRef, useState } from "react";
-import { deleteContact, getContact, updateContact } from "api";
+import { deleteContact, getContact } from "api";
 import { AddField, Button, DeleteWarning, FlexBox, GridBox, Label, LabelInput, Loader, MaxHeightContainer, Modal, NoteBox, NotFound } from "components";
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import { Contact, Note } from "typings";
 import './ContactRoute.scss'
 import { faPlus, faSave, faTimes, faTrash } from "@fortawesome/free-solid-svg-icons";
-import { useOnClickOutside } from "hooks";
+import { useOnClickOutside, useUpdateContact } from "hooks";
 import { maskingFuncs } from "hooks/useMask/maskingFuncs";
-import { FieldSet, Record } from "airtable";
 import { WindowDimsContext } from "context";
 
 export const ContactRoute = () => {
@@ -40,31 +39,7 @@ export const ContactRoute = () => {
   const contact = contactQuery.data?.fields as unknown as Contact | undefined
   const notes = contactQuery.data?.fields.notes ? JSON.parse(contactQuery.data?.fields.notes as string) as Note[] | undefined : []
   
-  const updateContactMutation = useMutation(updateContact, {
-    onMutate: async (newContact) => {
-      await queryClient.cancelQueries(CONTACT_QUERY_KEY)
-
-      const prevContact = queryClient.getQueryData<Record<FieldSet>>(CONTACT_QUERY_KEY)
-
-      if (prevContact) {
-        const parsedNewContact = {
-          ...newContact,
-          notes: JSON.stringify(newContact.notes)
-        }
-        queryClient.setQueryData(CONTACT_QUERY_KEY, {
-          ...prevContact,
-          fields: {
-            ...prevContact?.fields,
-            ...parsedNewContact
-          }
-        })
-      }
-      return { prevContact }
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries(CONTACT_QUERY_KEY)
-    }
-  })
+  const mutateContact = useUpdateContact()
 
   const updateContactNotes = (newNote: Note) => {
     if (!contact) { return }
@@ -74,10 +49,7 @@ export const ContactRoute = () => {
       ...(notes || [])
     ]
 
-    updateContactMutation.mutate({
-      ...contact,
-      notes: newNotes
-    })
+    mutateContact({notes: newNotes})
   }
 
 
@@ -95,33 +67,19 @@ export const ContactRoute = () => {
   const handleNoteDelete = (index: number) => {
     if (!contact) { return }
     const newNotes = notes ? [...notes?.slice(0, index), ...notes?.slice(index + 1)] : []
-    updateContactMutation.mutate({
-      ...contact,
-      notes: newNotes
-    })
+    mutateContact({notes: newNotes})
   }
 
-  const handleSaveNote = (noteDetail: string, index: number) => {
+  const handleSaveNote = (newNote: Note, index: number) => {
     if (!contact || !notes) { return }
-    const newNote: Note = {
-      ...notes[index],
-      details: noteDetail
-    }
     const newNotes = [...notes?.slice(0, index), newNote, ...notes.slice(index + 1)]
-    updateContactMutation.mutate({
-      ...contact,
-      notes: newNotes
-    })
+    mutateContact({notes: newNotes})
   }
 
   const handleUpdateDetails = (detail: string, field: 'name' | 'phone_number' | 'email') => {
     if (!contact || !notes) { return }
-    const newContact = {
-      ...contact,
-      notes,
-      [field]: detail
-    }
-    updateContactMutation.mutate(newContact)
+    const newContact = { [field]: detail }
+    mutateContact(newContact)
   }
 
   const deleteContactMutation = useMutation(deleteContact, {
@@ -210,7 +168,7 @@ export const ContactRoute = () => {
                   key={note.date}
                   note={note}
                   onDelete={() => handleNoteDelete(i)}
-                  onChange={detail => handleSaveNote(detail, i)}
+                  onChange={newNote => handleSaveNote(newNote, i)}
                   canDelete={notes.length > 1}
                 />
               ))}
