@@ -1,27 +1,32 @@
-import React, { useRef, useState } from "react";
+import React, { ChangeEvent, useRef, useState } from "react";
 import { Button, DeleteWarning, FlexBox, Modal, ImageCapture, ImageDisplay } from "components";
-import { useImageCapture, useOnClickOutside } from "hooks";
+import { useOnClickOutside } from "hooks";
 import { faSave, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { Note } from "typings";
 import './NoteBox.scss'
 
-export const NoteBox = ({note, onDelete, onChange, canDelete}: {note: Note, onDelete: () => void, onChange: (newNote: Note) => void, canDelete: boolean}) => {
+export const NoteBox = ({note, onDelete, onChange, canDelete}: {note: Note & {id: string}, onDelete: (id: string) => void, onChange: (newNote: Note) => void, canDelete: boolean}) => {
   const [edit, setEdit] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [details, setDetails] = useState(note.details)
   const noteRef = useRef<HTMLTextAreaElement>(null)
   const cancelButtonRef = useRef<HTMLButtonElement>(null)
   const saveButtonRef = useRef<HTMLButtonElement>(null)
-  const {
-    videoRef,
-    showCaptureModal,
-    setShowCaptureModal,
-    dataUrl,
-    handleOpenCapture,
-    handleTakePhoto,
-    handleRetake,
-    handleSavePhoto,
-  } = useImageCapture()
+
+  const handleTakePhoto = (e: ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) { return }
+    const reader = new FileReader()
+    reader.onload = () => {
+      const dataUrl = reader.result
+      if (typeof dataUrl === 'string') {
+        onChange({
+          ...note,
+          image: 'NK7ofeKPFmkk'
+        })
+      }
+    }
+    reader.readAsDataURL(e.target.files[0])
+  }
 
   useOnClickOutside([noteRef, cancelButtonRef, saveButtonRef], () => {
     setEdit(false)
@@ -38,21 +43,6 @@ export const NoteBox = ({note, onDelete, onChange, canDelete}: {note: Note, onDe
     })
   }
 
-  const handleSaveImage = () => {
-    const dataUrl = handleSavePhoto()
-    onChange({
-      ...note,
-      image: dataUrl
-    })
-  }
-
-  const handleDeleteImage = () => {
-    onChange({
-      ...note,
-      image: ''
-    })
-  }
-
   const splitNote = note.details.split('\n')
 
   return (
@@ -60,21 +50,11 @@ export const NoteBox = ({note, onDelete, onChange, canDelete}: {note: Note, onDe
       <FlexBox gap="1rem" alignItems="center" justifyContent="space-between" padding="0 .5rem">
         <span className="NoteBox__date">{date}</span>
         <FlexBox gap=".25rem">
-          {(!note.image || showCaptureModal) && (
-            <ImageCapture
-              videoRef={videoRef}  
-              showModal={showCaptureModal}
-              setShowModal={setShowCaptureModal}
-              onRetake={handleRetake}
-              image={dataUrl}
-              onPreview={handleTakePhoto}
-              onSave={handleSaveImage}
-            />
-          )}
+          {!note.image && <ImageCapture onChange={handleTakePhoto} />}
           <Button isDisabled={!canDelete} isRounded kind="danger" icon={faTrash} onClick={() => setShowDeleteModal(true)} />
         </FlexBox>
       </FlexBox>
-      {note.image && <ImageDisplay image={note.image} onEdit={handleOpenCapture} onDelete={handleDeleteImage} />}
+      {note.image && <ImageDisplay id={note.image} onReplace={handleTakePhoto} onDelete={() => {}} />}
       {edit ? (
         <>
           <textarea ref={noteRef} rows={10} value={details} onChange={e => setDetails(e.target.value)} />
@@ -91,7 +71,7 @@ export const NoteBox = ({note, onDelete, onChange, canDelete}: {note: Note, onDe
         <Modal offClick={() => setShowDeleteModal(false)}>
           <DeleteWarning
             onClose={() => setShowDeleteModal(false)}
-            onDelete={onDelete}
+            onDelete={() => onDelete(note.id)}
           >
             This note cannot be recovered once delete.
           </DeleteWarning>

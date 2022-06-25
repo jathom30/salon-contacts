@@ -1,5 +1,7 @@
-// future state
+
 export type Note = {
+  id: string
+  hair_formula: string[]
   date: string
   details: string
   image?: string
@@ -10,5 +12,5 @@ export type Contact = {
   name: string
   phone_number?: string
   email?: string
-  notes: Note[]
+  note_ids?: string[]
 }
