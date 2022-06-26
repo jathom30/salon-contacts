@@ -39,6 +39,9 @@ function App() {
               <ContactListRoute />
             </ProtectedRoute>
           } />
+          <Route path="#recovery-token" element={
+            <p>recovery token</p>
+          } />
           <Route path="/create-new" element={
             <ProtectedRoute>
               <CreateContactRoute />

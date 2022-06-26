@@ -4,7 +4,7 @@ import { base } from "./setup";
 
 const contactsBase = base(process.env.REACT_APP_AIRTABLE_CONTACTS_TABLE || '')
 
-export const getContacts = () => contactsBase.select().all()
+export const getContacts = (userId: string) => contactsBase.select({filterByFormula: `SEARCH("${userId}", {user_id})`}).all()
 
 export const getContact = (id: string) => contactsBase.find(id)
 

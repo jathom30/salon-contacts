@@ -8,22 +8,23 @@ export const Input: React.FC<{
   value: string | number;
   onChange: (val: string) => void;
   placeholder?: string;
+  type?: 'number' | 'password' | 'string'
   name: string;
   step?: number
   required?: boolean
   hasError?: boolean
-}> = ({label, value, onChange, name, step, required = false, placeholder, hasError = false}) => {
-  const type = typeof value === 'string' ? 'string' : 'number'
+}> = ({label, value, type, onChange, name, step, required = false, placeholder, hasError = false}) => {
+  const inputType = type ? type : typeof value === 'string' ? 'string' : 'number'
 
   const handleKeyPress = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (type !== 'number') return
+    if (inputType !== 'number') return
     const numberValue = value as number
     if (e.key === '.' && isNaN(numberValue)) {
       onChange('0.')
     }
   }
   const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    if (type !== 'number') return
+    if (inputType !== 'number') return
     const numberValue = value as number
     if (isNaN(numberValue)) {
       onChange('0')
@@ -40,7 +41,7 @@ export const Input: React.FC<{
         <input
           className='Input__input'
           placeholder={placeholder}
-          type={type}
+          type={inputType}
           name={name}
           value={value}
           onChange={e => onChange(e.target.value)}
