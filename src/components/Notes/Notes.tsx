@@ -16,7 +16,7 @@ export const Notes = ({contactId}: {contactId: string}) => {
     setNote('')
   })
 
-  const {notes, createMutate, updateMutate, deleteMutate } = useUpdateNotes()
+  const {notes, createMutate, updateMutate, deleteMutate, deleteLoading } = useUpdateNotes()
 
   const handleSaveNew = () => {
     setShowNewNote(false)
@@ -57,15 +57,17 @@ export const Notes = ({contactId}: {contactId: string}) => {
           <textarea ref={newNoteRef} rows={10} value={note} onChange={e => setNote(e.target.value)} />
         )}
         <GridBox gap="1rem" gridTemplateColumns="repeat(auto-fill, minmax(350px, 1fr))">
-          {notes?.map((note) => (
+          {notes?.map((note) => {
+            return (
             <NoteBox
               key={note.id}
               note={note}
               onDelete={handleDelete}
+              loadingDelete={deleteLoading}
               onChange={handleUpdateNote}
               canDelete={notes.length > 1}
             />
-          ))}
+          )})}
         </GridBox>
       </FlexBox>
     </div>

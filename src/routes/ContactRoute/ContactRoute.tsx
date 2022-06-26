@@ -1,35 +1,24 @@
-import React, { MouseEvent, useContext, useRef, useState } from "react";
+import React, { MouseEvent, useContext, useEffect, useState } from "react";
 import { deleteContact, getContact, updateContact } from "api";
-import { AddField, Button, DeleteWarning, FlexBox, Notes, Label, LabelInput, Loader, MaxHeightContainer, Modal, NoteBox, NotFound } from "components";
+import { AddField, Button, DeleteWarning, FlexBox, Notes, Label, LabelInput, Loader, MaxHeightContainer, Modal, NotFound } from "components";
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import { useNavigate, useParams } from "react-router-dom";
-import { Contact, Note } from "typings";
+import { Contact } from "typings";
 import './ContactRoute.scss'
-import { faPlus, faSave, faTimes, faTrash } from "@fortawesome/free-solid-svg-icons";
-import { useOnClickOutside } from "hooks";
+import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import { maskingFuncs } from "hooks/useMask/maskingFuncs";
 import { FieldSet, Record } from "airtable";
 import { WindowDimsContext } from "context";
 
 export const ContactRoute = () => {
   const { id } = useParams()
-  const [showNewNote, setShowNewNote] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
-  const [note, setNote] = useState('')
   const navigate = useNavigate()
-  const newNoteRef = useRef<HTMLTextAreaElement>(null)
-  const saveNoteRef = useRef<HTMLButtonElement>(null)
 
   const queryClient = useQueryClient()
   const {isMobileWidth} = useContext(WindowDimsContext)
 
-  
-  useOnClickOutside([newNoteRef, saveNoteRef], () => {
-    setShowNewNote(false)
-    setNote('')
-  })
-
-  const CONTACT_QUERY_KEY = ['contact', id]
+    const CONTACT_QUERY_KEY = ['contact', id]
   
   const contactQuery = useQuery(
     CONTACT_QUERY_KEY,
@@ -38,7 +27,13 @@ export const ContactRoute = () => {
     )
     
   const contact = contactQuery.data?.fields as unknown as Contact | undefined
-  const notes = contactQuery.data?.fields.notes ? JSON.parse(contactQuery.data?.fields.notes as string) as Note[] | undefined : []
+
+  useEffect(() => {
+    const retypedContact = contact as unknown as {notes: string}
+    if (!retypedContact?.notes) { return }
+    const notes = JSON.parse(retypedContact?.notes)
+    console.log(notes, id)
+  }, [contact, id])
   
   const updateContactMutation = useMutation(updateContact, {
     onMutate: async (newContact) => {
@@ -62,56 +57,9 @@ export const ContactRoute = () => {
     }
   })
 
-  // const updateContactNotes = (newNote: Note) => {
-  //   if (!contact) { return }
-
-  //   const newNotes = [
-  //     newNote,
-  //     ...(notes || [])
-  //   ]
-
-  //   updateContactMutation.mutate({
-  //     ...contact,
-  //     notes: newNotes
-  //   })
-  // }
-
-
-  // const handleSave = () => {
-  //   setShowNewNote(false)
-  //   if (!note) { return }
-  //   const today = new Date()
-  //   // updateContactNotes({
-  //   //   date: today.toString(),
-  //   //   details: note
-  //   // })
-  //   setNote('')
-  // }
-
-  // const handleNoteDelete = (index: number) => {
-  //   if (!contact) { return }
-  //   const newNotes = notes ? [...notes?.slice(0, index), ...notes?.slice(index + 1)] : []
-  //   updateContactMutation.mutate({
-  //     ...contact,
-  //     // notes: newNotes
-  //   })
-  // }
-
-  // const handleSaveNote = (noteDetail: string, index: number) => {
-  //   if (!contact || !notes) { return }
-  //   const newNote: Note = {
-  //     ...notes[index],
-  //     details: noteDetail
-  //   }
-  //   const newNotes = [...notes?.slice(0, index), newNote, ...notes.slice(index + 1)]
-  //   updateContactMutation.mutate({
-  //     ...contact,
-  //     notes: newNotes
-  //   })
-  // }
 
   const handleUpdateDetails = (detail: string, field: 'name' | 'phone_number' | 'email') => {
-    if (!contact || !notes) { return }
+    if (!contact) { return }
     const newContact = {
       ...contact,
       [field]: detail

@@ -20,7 +20,14 @@ export const CreateContactRoute = () => {
 
   const navigate = useNavigate()
 
-  const createNoteMutation = useMutation(createNote, {
+  const createNoteMutation = useMutation((newNote: Omit<Note, 'id'>) => {
+    const delayedResponse = new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(createNote(newNote));
+      }, 2000);
+    });
+    return delayedResponse as Promise<Record<FieldSet>[]>
+  }, {
     onSuccess: (data) => {
       // hair_formula is the contact id we should route to
       navigate(`/${data[0].fields.hair_formula}`)
@@ -90,9 +97,7 @@ export const CreateContactRoute = () => {
             hasError={!isValidEmail}
           />
           <FlexBox flexDirection="column" gap=".25rem" flexGrow={1}>
-            <Label required>
-              <span>Note</span>
-            </Label>
+            <Label required>Note</Label>
             <textarea value={note} onChange={e => setNote(e.target.value)} rows={10} />
           </FlexBox>
           <Button type="submit" kind="primary" isDisabled={disabled}>Submit</Button>
