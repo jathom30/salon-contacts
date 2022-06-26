@@ -1,4 +1,4 @@
-import React, { MouseEvent, useContext, useEffect, useState } from "react";
+import React, { MouseEvent, useContext, useState } from "react";
 import { deleteContact, getContact, updateContact } from "api";
 import { AddField, Button, DeleteWarning, FlexBox, Notes, Label, LabelInput, Loader, MaxHeightContainer, Modal, NotFound } from "components";
 import { useMutation, useQuery, useQueryClient } from "react-query";
@@ -27,13 +27,6 @@ export const ContactRoute = () => {
     )
     
   const contact = contactQuery.data?.fields as unknown as Contact | undefined
-
-  useEffect(() => {
-    const retypedContact = contact as unknown as {notes: string}
-    if (!retypedContact?.notes) { return }
-    const notes = JSON.parse(retypedContact?.notes)
-    console.log(notes, id)
-  }, [contact, id])
   
   const updateContactMutation = useMutation(updateContact, {
     onMutate: async (newContact) => {
