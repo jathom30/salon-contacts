@@ -92,5 +92,3 @@ export const useUpdateNotes = () => {
     deleteLoading: deleteNoteMutation.isLoading,
   }
 }
-
-// [...notes?.slice(0, index), ...notes?.slice(index + 1)]
