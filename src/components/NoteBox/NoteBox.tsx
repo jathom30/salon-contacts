@@ -5,7 +5,7 @@ import { faSave, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { Note } from "typings";
 import './NoteBox.scss'
 
-export const NoteBox = ({note, onDelete, onChange, canDelete}: {note: Note, onDelete: () => void, onChange: (noteDetails: string) => void, canDelete: boolean}) => {
+export const NoteBox = ({note, onDelete, onChange, canDelete}: {note: Note, onDelete: (id: string) => void, onChange: (newNote: Note) => void, canDelete: boolean}) => {
   const [edit, setEdit] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [details, setDetails] = useState(note.details)
@@ -22,7 +22,10 @@ export const NoteBox = ({note, onDelete, onChange, canDelete}: {note: Note, onDe
 
   const handleSave = () => {
     setEdit(false)
-    onChange(details)
+    onChange({
+      ...note,
+      details
+    })
   }
 
   const splitNote = note.details.split('\n')
@@ -49,7 +52,7 @@ export const NoteBox = ({note, onDelete, onChange, canDelete}: {note: Note, onDe
         <Modal offClick={() => setShowDeleteModal(false)}>
           <DeleteWarning
             onClose={() => setShowDeleteModal(false)}
-            onDelete={onDelete}
+            onDelete={() => onDelete(note.id)}
           >
             This note cannot be recovered once delete.
           </DeleteWarning>
