@@ -25,7 +25,7 @@ export const AddField = ({label, onSubmit, validation}: {label: string; onSubmit
     return (
       <div className="AddField">
         <form ref={formRef} onSubmit={handleSubmit}>
-          <FlexBox gap="1rem">
+          <FlexBox gap="1rem" alignItems="center">
             <Input name={label} value={value} onChange={setValue} placeholder={label} hasError={!isValid} />
             <Button type="submit" icon={faSave} isRounded kind="primary" />
           </FlexBox>

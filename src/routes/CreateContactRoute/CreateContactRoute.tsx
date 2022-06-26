@@ -1,5 +1,5 @@
 import React, { FormEvent, useState } from "react";
-import { createContact } from "api";
+import { createContact, createNote } from "api";
 import { ContactCardsSVG } from "assets";
 import { Button, FlexBox, Input, Label } from "components";
 import { useValidatedMask, useValidatedState } from "hooks";
@@ -20,37 +20,44 @@ export const CreateContactRoute = () => {
 
   const navigate = useNavigate()
 
-  const createContactMutation = useMutation((newContact: Omit<Contact, 'id'>) => {
+  const createNoteMutation = useMutation((newNote: Omit<Note, 'id'>) => {
     const delayedResponse = new Promise((resolve) => {
       setTimeout(() => {
-        resolve(createContact(newContact));
+        resolve(createNote(newNote));
       }, 2000);
     });
     return delayedResponse as Promise<Record<FieldSet>[]>
   }, {
-    onSuccess: (data: Record<FieldSet>[]) => {
-      navigate(`/${data[0].id}`)
+    onSuccess: (data) => {
+      // hair_formula is the contact id we should route to
+      navigate(`/${data[0].fields.hair_formula}`)
+    }
+  })
+
+  const createContactMutation = useMutation(createContact, {
+    onSuccess: (data) => {
+      createNoteMutation.mutate({
+        hair_formula: [data[0].id],
+        date: new Date().toString(),
+        details: note,
+      })
     }
   })
 
   const handleCreateContact = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    const noteWithDate: Note = {
-      date: new Date().toString(),
-      details: note
-    }
+
     const formData: Omit<Contact, 'id'> = {
       name,
       ...(!!phone && {phone_number: phone}),
       ...(!!email && {email}),
-      notes: [noteWithDate]
     }
     createContactMutation.mutate(formData)
   }
 
   const disabled = !!(!name || !note)
 
-  if (createContactMutation.isLoading) {
+  if (createContactMutation.isLoading || createNoteMutation.isLoading) {
     return (
       <div className="CreateContactRoute">
         <div className="CreateContactRoute__loader">
@@ -90,9 +97,7 @@ export const CreateContactRoute = () => {
             hasError={!isValidEmail}
           />
           <FlexBox flexDirection="column" gap=".25rem" flexGrow={1}>
-            <Label required>
-              <span>Note</span>
-            </Label>
+            <Label required>Note</Label>
             <textarea value={note} onChange={e => setNote(e.target.value)} rows={10} />
           </FlexBox>
           <Button type="submit" kind="primary" isDisabled={disabled}>Submit</Button>
