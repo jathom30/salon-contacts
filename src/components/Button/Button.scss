@@ -19,10 +19,9 @@
   }
   &__primary {
     background: var(--color-primary);
-    color: var(--color-primary-text);
+    color: white;
     &:hover {
       background-color: var(--color-primary-darken);
-      color: white;
     }
   }
   &__danger {

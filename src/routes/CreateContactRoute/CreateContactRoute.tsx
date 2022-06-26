@@ -3,13 +3,15 @@ import { createContact, createNote } from "api";
 import { ContactCardsSVG } from "assets";
 import { Button, FlexBox, Input, Label } from "components";
 import { useValidatedMask, useValidatedState } from "hooks";
-import { useMutation } from "react-query";
+import { useMutation, useQueryClient } from "react-query";
 import { useNavigate } from "react-router-dom";
 import { Contact, Note } from "typings";
 import './CreateContactRoute.scss'
 import { FieldSet, Record } from "airtable";
+import { useIdentityContext } from "react-netlify-identity";
 
 export const CreateContactRoute = () => {
+  const { user } = useIdentityContext()
   const [name, setName] = useState('')
   const [phone, setPhone, isValidPhone] = useValidatedMask({
     initialState: '',
@@ -19,6 +21,7 @@ export const CreateContactRoute = () => {
   const [note, setNote] = useState('')
 
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
 
   const createNoteMutation = useMutation((newNote: Omit<Note, 'id'>) => {
     const delayedResponse = new Promise((resolve) => {
@@ -29,6 +32,7 @@ export const CreateContactRoute = () => {
     return delayedResponse as Promise<Record<FieldSet>[]>
   }, {
     onSuccess: (data) => {
+      queryClient.invalidateQueries(['contacts', user?.id])
       // hair_formula is the contact id we should route to
       navigate(`/${data[0].fields.hair_formula}`)
     }
@@ -46,9 +50,10 @@ export const CreateContactRoute = () => {
 
   const handleCreateContact = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-
+    if (!user?.id) { return }
     const formData: Omit<Contact, 'id'> = {
       name,
+      user_id: user?.id,
       ...(!!phone && {phone_number: phone}),
       ...(!!email && {email}),
     }

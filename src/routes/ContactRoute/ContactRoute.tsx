@@ -9,8 +9,10 @@ import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import { maskingFuncs } from "hooks/useMask/maskingFuncs";
 import { FieldSet, Record } from "airtable";
 import { WindowDimsContext } from "context";
+import { useIdentityContext } from "react-netlify-identity";
 
 export const ContactRoute = () => {
+  const { user } = useIdentityContext()
   const { id } = useParams()
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const navigate = useNavigate()
@@ -63,6 +65,7 @@ export const ContactRoute = () => {
   const deleteContactMutation = useMutation(deleteContact, {
     onSuccess: () => { 
       queryClient.invalidateQueries('contacts')
+      queryClient.prefetchQuery('contacts')
       navigate("/")
     }
   })

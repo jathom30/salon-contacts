@@ -20,6 +20,12 @@
     padding: 1rem;
     background: var(--color-component-background);
   }
+  &__reset-text {
+    text-align: center;
+  }
+  &__error-message {
+    color: var(--color-danger);
+  }
   @media screen and (min-width: 650px) {
     flex-direction: row-reverse;
     gap: 3rem;
