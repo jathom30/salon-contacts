@@ -86,6 +86,7 @@ export const useUpdateNotes = () => {
 
   return {
     notes: notesSortedByDate,
+    notesLoading: notesQuery.isLoading,
     createMutate: createNoteMutation.mutate,
     updateMutate: updateNoteMutation.mutate,
     deleteMutate: deleteNoteMutation.mutate,

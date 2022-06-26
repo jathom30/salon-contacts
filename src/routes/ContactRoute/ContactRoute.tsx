@@ -129,7 +129,7 @@ export const ContactRoute = () => {
               </FlexBox>
             </div>
           </FlexBox>
-          {id && <Notes contactId={id} />}
+          <Notes />
         </FlexBox>
       </MaxHeightContainer>
       {showDeleteModal && (

@@ -1,11 +1,13 @@
 import React, { useRef, useState } from "react";
-import { FlexBox, Label, Button, GridBox, NoteBox } from "components";
+import { FlexBox, Label, Button, GridBox, NoteBox, Loader } from "components";
 import { faPlus, faSave, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { Note } from "typings";
 import { useOnClickOutside } from "hooks";
 import { useUpdateNotes } from "hooks";
+import { useParams } from "react-router-dom";
 
-export const Notes = ({contactId}: {contactId: string}) => {
+export const Notes = () => {
+  const { id } = useParams()
   const [showNewNote, setShowNewNote] = useState(false)
   const [note, setNote] = useState('')
   const newNoteRef = useRef<HTMLTextAreaElement>(null)
@@ -16,13 +18,13 @@ export const Notes = ({contactId}: {contactId: string}) => {
     setNote('')
   })
 
-  const {notes, createMutate, updateMutate, deleteMutate, deleteLoading } = useUpdateNotes()
+  const {notes, notesLoading, createMutate, updateMutate, deleteMutate, deleteLoading } = useUpdateNotes()
 
   const handleSaveNew = () => {
     setShowNewNote(false)
     if (!note) { return }
     createMutate({
-      hair_formula: [contactId],
+      hair_formula: [id || ''],
       date: (new Date()).toString(),
       details: note,
     })
@@ -35,6 +37,17 @@ export const Notes = ({contactId}: {contactId: string}) => {
 
   const handleUpdateNote = (newNote: Note) => {
     updateMutate(newNote)
+  }
+
+  if (notesLoading) {
+    return (
+      <div className="Notes">
+        <FlexBox flexDirection="column" gap="1rem">
+          <Label>Notes</Label>
+          <Loader />
+        </FlexBox>
+      </div>
+    )
   }
 
   return (
