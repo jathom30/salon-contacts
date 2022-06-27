@@ -10,12 +10,15 @@ import { maskingFuncs } from "hooks/useMask/maskingFuncs";
 import { FieldSet, Record, Records } from "airtable";
 import { WindowDimsContext } from "context";
 import { useIdentityContext } from "react-netlify-identity";
+import { useUpdateNotes } from "hooks";
 
 export const ContactRoute = () => {
   const { user } = useIdentityContext()
   const { id } = useParams()
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const navigate = useNavigate()
+
+  const { deleteAllNotesMutation } = useUpdateNotes()
 
   const queryClient = useQueryClient()
   const {isMobileWidth} = useContext(WindowDimsContext)
@@ -74,7 +77,9 @@ export const ContactRoute = () => {
       }
       return { prevContacts }
     },
-    onSuccess: () => { 
+    onSuccess: () => {
+      // after deleting contact, delete all its related notes
+      deleteAllNotesMutation.mutate()
       navigate("/")
     },
     onSettled: () => {

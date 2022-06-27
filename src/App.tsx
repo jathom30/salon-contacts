@@ -1,8 +1,8 @@
-import { Button, Header, MaxHeightContainer, Modal } from 'components';
+import { Header, MaxHeightContainer, Modal } from 'components';
 import React, { useEffect } from 'react';
 import {Routes, Route, useLocation} from 'react-router-dom'
 import { useIdentityContext } from 'react-netlify-identity'
-import { ContactListRoute, ContactRoute, CreateContactRoute, LoginRoute, PasswordResetRoute, UserRoute } from 'routes';
+import { ContactListRoute, ContactRoute, CreateContactRoute, LoginRoute, AccountRecoveryRoute, UserRoute } from 'routes';
 import './App.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEnvelope } from '@fortawesome/free-solid-svg-icons';
@@ -13,7 +13,7 @@ const ProtectedRoute = ({children}: {children: JSX.Element}) => {
 
   if (location.hash.includes('recovery_token')) {
     return (
-      <PasswordResetRoute />
+      <AccountRecoveryRoute />
     )
   }
 
@@ -55,11 +55,11 @@ function App() {
               <CreateContactRoute />
             </ProtectedRoute>
           } />
-          {/* <Route path="/user" element={
+          <Route path="/user-settings" element={
             <ProtectedRoute>
               <UserRoute />
             </ProtectedRoute>
-          } /> */}
+          } />
           <Route path="/:id" element={
             <ProtectedRoute>
               <ContactRoute />
