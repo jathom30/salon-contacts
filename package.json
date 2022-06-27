@@ -16,6 +16,7 @@
     "@types/react-dom": "^18.0.5",
     "airtable": "^0.11.4",
     "axios": "^0.27.2",
+    "gotrue-js": "^0.9.29",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-netlify-identity": "^0.2.7",
