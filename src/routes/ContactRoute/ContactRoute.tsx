@@ -7,7 +7,7 @@ import { Contact } from "typings";
 import './ContactRoute.scss'
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import { maskingFuncs } from "hooks/useMask/maskingFuncs";
-import { FieldSet, Record } from "airtable";
+import { FieldSet, Record, Records } from "airtable";
 import { WindowDimsContext } from "context";
 import { useIdentityContext } from "react-netlify-identity";
 
@@ -63,10 +63,24 @@ export const ContactRoute = () => {
   }
 
   const deleteContactMutation = useMutation(deleteContact, {
+    onMutate: async (deletedId) => {
+      await queryClient.cancelQueries(['contacts', user?.id])
+      
+      const prevContacts = queryClient.getQueryData<Records<FieldSet>>(['contacts', user?.id])
+
+      if (prevContacts) {
+        const filteredContacts = prevContacts.filter(prevContact => prevContact.id !== deletedId)
+        queryClient.setQueryData(['contacts', user?.id], filteredContacts)
+      }
+      return { prevContacts }
+    },
     onSuccess: () => { 
       queryClient.invalidateQueries('contacts')
       queryClient.prefetchQuery('contacts')
       navigate("/")
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries(['contacts', user?.id])
     }
   })
 

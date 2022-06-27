@@ -7,7 +7,7 @@ import { useMutation, useQueryClient } from "react-query";
 import { useNavigate } from "react-router-dom";
 import { Contact, Note } from "typings";
 import './CreateContactRoute.scss'
-import { FieldSet, Record } from "airtable";
+import { FieldSet, Record, Records } from "airtable";
 import { useIdentityContext } from "react-netlify-identity";
 
 export const CreateContactRoute = () => {
@@ -23,6 +23,8 @@ export const CreateContactRoute = () => {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
 
+  const CONTACTS_QUERY_KEY = ['contacts', user?.id]
+
   const createNoteMutation = useMutation((newNote: Omit<Note, 'id'>) => {
     const delayedResponse = new Promise((resolve) => {
       setTimeout(() => {
@@ -32,19 +34,40 @@ export const CreateContactRoute = () => {
     return delayedResponse as Promise<Record<FieldSet>[]>
   }, {
     onSuccess: (data) => {
-      queryClient.invalidateQueries(['contacts', user?.id])
       // hair_formula is the contact id we should route to
       navigate(`/${data[0].fields.hair_formula}`)
     }
   })
 
   const createContactMutation = useMutation(createContact, {
+    onMutate: async (newContact) => {
+      await queryClient.cancelQueries(CONTACTS_QUERY_KEY)
+
+      const prevContacts = queryClient.getQueryData<Records<FieldSet>>(CONTACTS_QUERY_KEY)
+
+      if (prevContacts) {
+        queryClient.setQueryData(CONTACTS_QUERY_KEY, [
+          ...prevContacts,
+          {
+            fields: {
+              // id will be replaced upon refetch
+              id: 'temp_id',
+              ...newContact
+            }
+          }
+        ])
+      }
+      return { prevContacts }
+    },
     onSuccess: (data) => {
       createNoteMutation.mutate({
         hair_formula: [data[0].id],
         date: new Date().toString(),
         details: note,
       })
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries(CONTACTS_QUERY_KEY)
     }
   })
 

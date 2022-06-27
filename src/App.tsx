@@ -1,12 +1,20 @@
 import { Header, MaxHeightContainer } from 'components';
 import React, { useEffect } from 'react';
-import {Routes, Route} from 'react-router-dom'
+import {Routes, Route, useLocation} from 'react-router-dom'
 import { useIdentityContext } from 'react-netlify-identity'
-import { ContactListRoute, ContactRoute, CreateContactRoute, LoginRoute } from 'routes';
+import { ContactListRoute, ContactRoute, CreateContactRoute, LoginRoute, PasswordResetRoute, UserRoute } from 'routes';
 import './App.scss';
 
 const ProtectedRoute = ({children}: {children: JSX.Element}) => {
   const { isLoggedIn } = useIdentityContext()
+  const location = useLocation()
+
+  if (location.hash.includes('recovery_token')) {
+    return (
+      <PasswordResetRoute />
+    )
+  }
+
   return (isLoggedIn) ? children : <LoginRoute />
 }
 
@@ -27,6 +35,7 @@ function App() {
     }
   }, [])
 
+
   return (
     <div className="App">
       <MaxHeightContainer
@@ -39,14 +48,16 @@ function App() {
               <ContactListRoute />
             </ProtectedRoute>
           } />
-          <Route path="#recovery-token" element={
-            <p>recovery token</p>
-          } />
           <Route path="/create-new" element={
             <ProtectedRoute>
               <CreateContactRoute />
             </ProtectedRoute>
           } />
+          {/* <Route path="/user" element={
+            <ProtectedRoute>
+              <UserRoute />
+            </ProtectedRoute>
+          } /> */}
           <Route path="/:id" element={
             <ProtectedRoute>
               <ContactRoute />

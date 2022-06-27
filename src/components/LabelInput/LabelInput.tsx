@@ -22,7 +22,7 @@ export const LabelInput: React.FC<LabelInputType> = ({
   onChange,
   isDisabled = false,
   placeholder,
-  children
+  children,
 }) => {
   const [input, setInput] = useState(value);
   const [isEditing, setIsEditing] = useState(false);

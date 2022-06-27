@@ -1,5 +1,5 @@
 import { Button, FlexBox } from "components";
-import { faPlus, faSignOut } from "@fortawesome/free-solid-svg-icons";
+import { faPlus, faSignOut, faUser } from "@fortawesome/free-solid-svg-icons";
 import { useIdentityContext } from 'react-netlify-identity'
 import React, { MouseEvent, useContext } from "react";
 import './Header.scss'
@@ -49,7 +49,8 @@ export const Header = () => {
         </Link>
         <FlexBox gap=".25rem">
           <Button icon={faPlus} kind="primary" isRounded onClick={handleCreateNew}>{isMobileWidth ? '' : 'New Contact'}</Button>
-          <Button icon={faSignOut} kind="secondary" isRounded onClick={handleLogout}>{isMobileWidth ? '' : 'Sign out'}</Button>
+          {/* <Button icon={faUser} kind="secondary" isRounded onClick={() => navigate('user')}>{isMobileWidth ? '' : 'User Details'}</Button> */}
+          <Button icon={faSignOut} isRounded onClick={handleLogout}>{isMobileWidth ? '' : 'Sign out'}</Button>
         </FlexBox>
       </div>
     </div>

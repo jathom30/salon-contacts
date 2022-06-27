@@ -20,7 +20,7 @@ export const LoginRoute = () => {
 
   const loginUserQuery = useQuery(
     ['login', email],
-    () => loginUser(email, password),
+    () => loginUser(email, password, true),
     {
       enabled: false,
       retry: false,
