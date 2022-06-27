@@ -45,8 +45,17 @@ export const ContactListRoute = () => {
             ? (
               <FlexBox alignItems="center" flexDirection="column" gap="1rem">
                 <FontAwesomeIcon size="4x" icon={faMagnifyingGlass} />
-                <span>Looks like you don't have any contacts created yet</span>
-                <Button kind="primary" isRounded icon={faPlus} onClick={() => navigate('create-new')}>Create your first here</Button>
+                {search ? (
+                  <>
+                    <span>No contacts found matching that name.</span>
+                    <Button kind="secondary" isRounded onClick={() => setSearch('')}>Clear Search</Button>
+                  </>
+                ): (
+                  <>
+                    <span>Looks like you don't have any contacts created yet</span>
+                    <Button kind="primary" isRounded icon={faPlus} onClick={() => navigate('create-new')}>Create your first here</Button>
+                  </>
+                )}
               </FlexBox>
             )
             : null
