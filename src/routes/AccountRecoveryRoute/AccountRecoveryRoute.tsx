@@ -23,9 +23,6 @@ export const AccountRecoveryRoute = () => {
 
   useQuery(['recover'], () => auth.recover(recoveryToken), {
     enabled: !!recoveryToken,
-    onSuccess: (data) => {
-      // setUser(data)
-    },
     onError: (err) => {
       console.error(err)
     }
