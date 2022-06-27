@@ -49,7 +49,7 @@ export const Header = () => {
         </Link>
         <FlexBox gap=".25rem">
           <Button icon={faPlus} kind="primary" isRounded onClick={handleCreateNew}>{isMobileWidth ? '' : 'New Contact'}</Button>
-          {/* <Button icon={faUser} kind="secondary" isRounded onClick={() => navigate('user')}>{isMobileWidth ? '' : 'User Details'}</Button> */}
+          <Button icon={faUser} kind="secondary" isRounded onClick={() => navigate('user-settings')}>{isMobileWidth ? '' : 'User Details'}</Button>
           <Button icon={faSignOut} isRounded onClick={handleLogout}>{isMobileWidth ? '' : 'Sign out'}</Button>
         </FlexBox>
       </div>

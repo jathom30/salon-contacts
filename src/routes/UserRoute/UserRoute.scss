@@ -1,4 +1,10 @@
 .UserRoute {
-  max-width: 1200px;
+  max-width: 800px;
   margin: 0 auto;
+  &__modal {
+    background: var(--color-component-background);
+    border-radius: .25rem;
+    margin: 1rem auto;
+    padding: 1rem;
+  }
 }

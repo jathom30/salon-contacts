@@ -83,6 +83,15 @@ export const useUpdateNotes = () => {
     }
   })
 
+  const deleteAllNotesMutation = useMutation(async () => {
+    const noteIds = notes?.map(note => note.id) || []
+    const responses = noteIds.map(async id => {
+      const response = await deleteNote(id)
+      return response
+    })
+    return Promise.all(responses)
+  })
+
 
   return {
     notes: notesSortedByDate,
@@ -91,5 +100,6 @@ export const useUpdateNotes = () => {
     updateMutate: updateNoteMutation.mutate,
     deleteMutate: deleteNoteMutation.mutate,
     deleteLoading: deleteNoteMutation.isLoading,
+    deleteAllNotesMutation
   }
 }
