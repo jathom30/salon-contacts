@@ -3,4 +3,15 @@
   height: var(--app-height);
   isolation: isolate;
   background: var(--color-background);
+  &__modal {
+    background: var(--color-component-background);
+    border-radius: .25rem;
+    margin: 1rem auto;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+    text-align: center;
+  }
 }

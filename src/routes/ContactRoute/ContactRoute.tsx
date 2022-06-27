@@ -75,8 +75,6 @@ export const ContactRoute = () => {
       return { prevContacts }
     },
     onSuccess: () => { 
-      queryClient.invalidateQueries('contacts')
-      queryClient.prefetchQuery('contacts')
       navigate("/")
     },
     onSettled: () => {

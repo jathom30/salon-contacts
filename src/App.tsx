@@ -1,9 +1,11 @@
-import { Header, MaxHeightContainer } from 'components';
+import { Button, Header, MaxHeightContainer, Modal } from 'components';
 import React, { useEffect } from 'react';
 import {Routes, Route, useLocation} from 'react-router-dom'
 import { useIdentityContext } from 'react-netlify-identity'
 import { ContactListRoute, ContactRoute, CreateContactRoute, LoginRoute, PasswordResetRoute, UserRoute } from 'routes';
 import './App.scss';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEnvelope } from '@fortawesome/free-solid-svg-icons';
 
 const ProtectedRoute = ({children}: {children: JSX.Element}) => {
   const { isLoggedIn } = useIdentityContext()
@@ -19,7 +21,7 @@ const ProtectedRoute = ({children}: {children: JSX.Element}) => {
 }
 
 function App() {
-  const { isLoggedIn } = useIdentityContext()
+  const { isLoggedIn, user, isConfirmedUser } = useIdentityContext()
 
   useEffect(() => {
     const handleResize = () => {
@@ -65,7 +67,15 @@ function App() {
           } />
         </Routes>
       </MaxHeightContainer>
-      
+      {isLoggedIn && !isConfirmedUser && (
+        <Modal>
+          <div className="App__modal">
+            <FontAwesomeIcon color="var(--color-primary)" icon={faEnvelope} size="5x" />
+            <h2>Verify your email address</h2>
+            <p>A verification email has been sent to {user?.email}. To complete the sign up process, please click the link in the email.</p>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 }

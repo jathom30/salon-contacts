@@ -2,7 +2,6 @@ import { Button, Input, FlexBox } from "components";
 import React, { MouseEvent, useState } from "react";
 import { useIdentityContext } from "react-netlify-identity";
 import { useQuery } from "react-query";
-import { useNavigate } from "react-router-dom";
 import './SignUpForm.scss'
 
 export const SignUpForm = () => {
@@ -16,7 +15,6 @@ export const SignUpForm = () => {
 
   const [registrationErr, setRegistrationErr] = useState('')
 
-  const navigate = useNavigate()
 
   const loginUserQuery = useQuery(
     ['register', email],
@@ -28,9 +26,6 @@ export const SignUpForm = () => {
       refetchOnWindowFocus: false,
       onError: (err: {name: string, status: number, json: {code: number, msg: string}}) => {
         setRegistrationErr(err.json.msg)
-      },
-      onSuccess: () => {
-          navigate('/')
       }
     }
   )
@@ -62,7 +57,7 @@ export const SignUpForm = () => {
                 Don’t fill this out if you’re human: <input name="bot-field" />
               </label>
             </p>
-            <Button kind="primary" type="submit" onClick={handleRegister} isDisabled={isDisabledRegister}>Login</Button>
+            <Button kind="primary" type="submit" onClick={handleRegister} isDisabled={isDisabledRegister}>Create Account</Button>
             {registrationErr && <span className="SignUpForm__error-message">{registrationErr}</span>}
           </FlexBox>
         </form>

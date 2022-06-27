@@ -21,20 +21,26 @@ export const UserRoute = () => {
       <FlexBox flexDirection="column" gap="1rem" padding="1rem">
         <h3>User Details</h3>
         <FlexBox flexDirection="column" gap=".5rem">
-          <GridBox gap=".25rem" gridTemplateColumns="repeat(auto-fit, minmax(250px, 1fr))">
-            <LabelInput value={user?.user_metadata.firstName} onSubmit={(val) => handleUpdate({firstName: val})}>
+          <GridBox gap=".5rem" gridTemplateColumns="repeat(auto-fit, minmax(250px, 1fr))">
+            <FlexBox flexDirection="column">
               <Label>First name</Label>
-              <span>{user?.user_metadata.firstName}</span>
-            </LabelInput>
-            <LabelInput value={user?.user_metadata.lastName} onSubmit={() => {}}>
+              <LabelInput value={user?.user_metadata.firstName} onSubmit={(val) => handleUpdate({firstName: val})}>
+                <span>{user?.user_metadata.firstName}</span>
+              </LabelInput>
+            </FlexBox>
+            <FlexBox flexDirection="column">
               <Label>Last name</Label>
-              <span>{user?.user_metadata.lastName}</span>
-            </LabelInput>
+              <LabelInput value={user?.user_metadata.lastName} onSubmit={() => {}}>
+                <span>{user?.user_metadata.lastName}</span>
+              </LabelInput>
+            </FlexBox>
           </GridBox>
+          <FlexBox flexDirection="column">
+            <Label>Email</Label>
             <LabelInput value={user?.email || ''} onSubmit={() => {}}>
-              <Label>Email</Label>
               <span>{user?.email}</span>
             </LabelInput>
+          </FlexBox>
           
           {/* <Input required type="password" label="Password" value={password} onChange={setPassword} name="password" />
           <Input required type="password" label="Verify Password" value={verifyPassword} onChange={setVerifyPassword} name="verify-password" /> */}
