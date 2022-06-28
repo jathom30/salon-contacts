@@ -1,11 +1,12 @@
 import React, { MouseEvent, useState } from "react";
-import { Button, FlexBox, Input, Loader } from "components";
+import { Button, FlexBox, Input, Loader, PasswordStrength } from "components";
 import { useMutation, useQuery } from "react-query";
 import GoTrue from 'gotrue-js'
 import { useLocation, useNavigate } from "react-router-dom";
 import './AccountRecoveryRoute.scss'
 import { Chair } from "assets";
 import { faSave } from "@fortawesome/free-solid-svg-icons";
+import { passwordStrength } from "utils";
 
 const auth = new GoTrue({
   APIUrl: 'https://salon-contacts.netlify.app/.netlify/identity',
@@ -39,7 +40,7 @@ export const AccountRecoveryRoute = () => {
     updatePasswordMutation.mutate()
   }
 
-  const isValidPassword = password.length > 0 && (password === confirmPassword)
+  const isValidPassword = password.length > 0 && (password === confirmPassword) && passwordStrength(password) > 0
 
   return (
     <div className="AccountRecoveryRoute">
@@ -57,8 +58,10 @@ export const AccountRecoveryRoute = () => {
           <p>Once you update your password below, you'll be taken to the log in screen to use your fresh credentials.</p>
           <form action="submit">
             <FlexBox flexDirection="column" gap="1rem" padding="1rem">
-              {/* <h3>Update your password</h3> */}
-              <Input type="password" label="Password" value={password} onChange={setPassword} name="password" />
+              <FlexBox flexDirection="column" gap=".5rem">
+                <Input type="password" label="Password" value={password} onChange={setPassword} name="password" />
+                <PasswordStrength password={password} />
+              </FlexBox>
               <Input type="password" label="Verify Password" value={confirmPassword} onChange={setConfirmPassword} name="verify-password" />
               <Button
                 icon={faSave}

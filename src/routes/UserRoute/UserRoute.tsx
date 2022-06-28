@@ -1,8 +1,9 @@
-import { Button, FlexBox, Input, Loader, Modal } from "components"
-import React, { MouseEvent, useState } from "react"
+import { Button, FlexBox, Input, Loader, Modal, PasswordStrength } from "components"
+import React, { MouseEvent, useEffect, useState } from "react"
 import { useIdentityContext } from "react-netlify-identity"
 import { useMutation } from "react-query"
 import { useNavigate } from "react-router-dom"
+import { passwordStrength } from "utils"
 import './UserRoute.scss'
 
 export const UserRoute = () => {
@@ -46,7 +47,7 @@ export const UserRoute = () => {
   }
 
   const isEnabledDetails = firstName !== user?.user_metadata.firstName || lastName !== user?.user_metadata.lastName
-  const isEnabledPassword = !!password && (password === verifyPassword)
+  const isEnabledPassword = !!password && (password === verifyPassword) && passwordStrength(password) > 0
 
   return (
     <div className="UserRoute">
@@ -66,7 +67,10 @@ export const UserRoute = () => {
           <form action="submit">
             <FlexBox flexDirection="column" gap="1rem">
               <h3>Update Password</h3>
-              <Input type="password" label="Password" value={password} onChange={setPassword} name="password" />
+              <FlexBox flexDirection="column" gap="0.5rem">
+                <Input type="password" label="Password" value={password} onChange={setPassword} name="password" />
+                <PasswordStrength password={password} />
+              </FlexBox>
               <Input type="password" label="Verify Password" value={verifyPassword} onChange={setVerifyPassword} name="verify-password" />
               <Button type="submit" kind="primary" onClick={handlePassword} isDisabled={!isEnabledPassword || updateUserMutation.isLoading}>
                 {updateUserMutation.isLoading ? <Loader /> : 'Update password'}

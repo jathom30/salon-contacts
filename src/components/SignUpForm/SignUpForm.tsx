@@ -1,7 +1,8 @@
-import { Button, Input, FlexBox } from "components";
+import { Button, Input, FlexBox, PasswordStrength } from "components";
 import React, { MouseEvent, useState } from "react";
 import { useIdentityContext } from "react-netlify-identity";
 import { useQuery } from "react-query";
+import { passwordStrength } from "utils";
 import './SignUpForm.scss'
 
 export const SignUpForm = () => {
@@ -35,7 +36,7 @@ export const SignUpForm = () => {
     loginUserQuery.refetch()
   }
 
-  const isDisabledRegister = !(firstName && lastName && email && password && verifyPassword) || password !== verifyPassword
+  const isDisabledRegister = !(firstName && lastName && email && password) || password !== verifyPassword || passwordStrength(password) < 1
 
   return (
     <div className="SignUpForm">
@@ -50,7 +51,10 @@ export const SignUpForm = () => {
             <Input required label="First name" value={firstName} onChange={setFirstName} name="first-name" />
             <Input required label="Last name" value={lastName} onChange={setLastName} name="last-name" />
             <Input required label="Email" value={email} onChange={setEmail} name="email" />
-            <Input required type="password" label="Password" value={password} onChange={setPassword} name="password" />
+            <FlexBox flexDirection="column" gap=".5rem">
+              <Input required type="password" label="Password" value={password} onChange={setPassword} name="password" />
+              <PasswordStrength password={password} />
+            </FlexBox>
             <Input required type="password" label="Verify Password" value={verifyPassword} onChange={setVerifyPassword} name="verify-password" />
             <p style={{display: "none"}}>
               <label>
