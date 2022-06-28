@@ -19,7 +19,9 @@ export const useUpdateNotes = () => {
   const notes = notesQuery.data?.map(d => d.fields) as unknown as Note[] | undefined
 
   const notesSortedByDate = notes?.sort((a, b) => {
-    if (a.date < b.date) {
+    const aTime = new Date(a.date)
+    const bTime = new Date(b.date)
+    if (aTime < bTime) {
       return 1
     } 
     return -1
