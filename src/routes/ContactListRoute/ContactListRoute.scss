@@ -18,4 +18,10 @@
       box-shadow: var(--box-shadow-hover);
     }
   }
+  &__modal {
+    background: var(--color-component-background);
+    margin: 1rem;
+    border-radius: .25rem;
+    width: 100%;
+  }
 }
