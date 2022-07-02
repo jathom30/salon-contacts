@@ -83,7 +83,7 @@ export const CreateContactRoute = () => {
     createContactMutation.mutate(formData)
   }
 
-  const disabled = !!(!name || !note)
+  const disabled = !!(!name || !note || !isValidEmail || !isValidPhone)
 
   if (createContactMutation.isLoading || createNoteMutation.isLoading) {
     return (
@@ -111,7 +111,7 @@ export const CreateContactRoute = () => {
           />
           <Input
             name="phone"
-            label="Phone nunber"
+            label="Phone number"
             value={phone}
             onChange={setPhone}
             hasError={!isValidPhone}
