@@ -1,3 +1,4 @@
+export * from './useContacts'
 export * from './useMask'
 export * from './useOnClickOutside'
 export * from './useValidation'
