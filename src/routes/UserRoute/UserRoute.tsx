@@ -135,9 +135,8 @@ export const UserRoute = () => {
         </p>
         <FlexBox flexDirection="column" gap="1rem">
           <h3>Download your contacts</h3>
-          <p>Its never a bad idea to back up your contacts. Click download below to download your contacts as a csv file.</p>
+          <p>Its never a bad idea to back up your contacts. Click the button below to download your contacts as a csv file.</p>
           <Button
-            isRounded
             icon={isDownloading ? undefined : faDownload}
             onClick={handleDownloadContacts}
             isDisabled={isDownloading}
