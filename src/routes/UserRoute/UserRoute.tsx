@@ -41,9 +41,11 @@ export const UserRoute = () => {
 
   const handleUpdateMetadata = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault()
-    updateUserMetaDataMutation.mutate({data: {
-      firstName, lastName
-    }})
+    updateUserMetaDataMutation.mutate({
+      data: {
+        firstName, lastName
+      }
+    })
   }
 
   const handlePassword = (e: MouseEvent<HTMLButtonElement>) => {
@@ -53,7 +55,7 @@ export const UserRoute = () => {
     }
   }
 
-  const {contacts} = useContacts()
+  const { contacts } = useContacts()
 
   const handleDownloadContacts = async () => {
     if (!contacts) return
@@ -61,7 +63,7 @@ export const UserRoute = () => {
 
     const limit = RateLimit(5) // requests per second
 
-    let contactsWithNotes: {name: string, email?: string, phone_number?: string, notes: string}[] = []
+    let contactsWithNotes: { name: string, email?: string, phone_number?: string, notes: { date: string, detail: string }[] }[] = []
 
     for (const contact of contacts) {
       await limit()
@@ -71,27 +73,25 @@ export const UserRoute = () => {
         ...contactsWithNotes,
         {
           name: contact.name,
-          ...(contact.email && {email: contact.email}),
-          ...(contact.phone_number && {phone_number: contact.phone_number}),
+          ...(contact.email && { email: contact.email }),
+          ...(contact.phone_number && { phone_number: contact.phone_number }),
           notes: notes.map(note => {
             const date = (new Date(note.date)).toDateString()
-            return `[${date}]: ${note.details}`
-          }).join(' // ') 
+            return {
+              date,
+              detail: note.details,
+            }
+          })
         }
       ]
     }
 
-    let csvContext = 'data:text/csv;charset=utf-8,'
-    const headers = ['name', 'email', 'phone_number', 'notes'] as const
-    const rows = contactsWithNotes.map(contact => headers.map((fieldName) => contact?.[fieldName] || '').join(','))
-    
-    const body = [headers.join(','), ...rows].join('\n')
-    csvContext += body
-    
-    const encodedUri = encodeURI(csvContext)
+    const jsonContacts = JSON.stringify(contactsWithNotes)
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(jsonContacts)
+
     const link = document.createElement('a')
-    link.setAttribute('href', encodedUri)
-    link.setAttribute('download', `${user?.user_metadata.firstName}-contacts.csv`)
+    link.setAttribute('href', dataStr)
+    link.setAttribute('download', `${user?.user_metadata.firstName}-contacts.json`)
     document.body.appendChild(link)
 
     link.click()
@@ -114,7 +114,7 @@ export const UserRoute = () => {
             </Button>
           </FlexBox>
         </form>
-        
+
         <form action="submit">
           <FlexBox flexDirection="column" gap="1rem">
             <h3>Update Password</h3>
@@ -128,20 +128,20 @@ export const UserRoute = () => {
             </Button>
           </FlexBox>
         </form>
-        <p style={{display: "none"}}>
+        <p style={{ display: "none" }}>
           <label>
             Don’t fill this out if you’re human: <input name="bot-field" />
           </label>
         </p>
         <FlexBox flexDirection="column" gap="1rem">
           <h3>Download your contacts</h3>
-          <p>Its never a bad idea to back up your contacts. Click the button below to download your contacts as a csv file.</p>
+          <p>Its never a bad idea to back up your contacts. Click the button below to download your contacts as a json file.</p>
           <Button
             icon={isDownloading ? undefined : faDownload}
             onClick={handleDownloadContacts}
             isDisabled={isDownloading}
           >
-            {isDownloading ? <Loader /> : 'Download CSV'}
+            {isDownloading ? <Loader /> : 'Download JSON'}
           </Button>
         </FlexBox>
       </FlexBox>
