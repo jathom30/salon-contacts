@@ -1,13 +1,13 @@
 import { Header, MaxHeightContainer, Modal } from 'components';
 import React, { useEffect } from 'react';
-import {Routes, Route, useLocation} from 'react-router-dom'
+import { Routes, Route, useLocation, Link } from 'react-router-dom'
 import { useIdentityContext } from 'react-netlify-identity'
 import { ContactListRoute, ContactRoute, CreateContactRoute, LoginRoute, AccountRecoveryRoute, UserRoute } from 'routes';
 import './App.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEnvelope } from '@fortawesome/free-solid-svg-icons';
 
-const ProtectedRoute = ({children}: {children: JSX.Element}) => {
+const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
   const { isLoggedIn } = useIdentityContext()
   const location = useLocation()
 
@@ -22,6 +22,7 @@ const ProtectedRoute = ({children}: {children: JSX.Element}) => {
 
 function App() {
   const { isLoggedIn, user, isConfirmedUser } = useIdentityContext()
+  const { pathname } = useLocation()
 
   useEffect(() => {
     const handleResize = () => {
@@ -43,6 +44,13 @@ function App() {
       <MaxHeightContainer
         fullHeight
         header={isLoggedIn && <Header />}
+        footer={
+          isLoggedIn && !pathname.includes('user-settings') ? (
+            <div className='main-banner'>
+              <p><span>NOTICE:</span> This website will go offline as of <strong>February 2024</strong>. At that time users will no longer be able to retrieve client info. We have a new service up at <a href='https://www.salonclients.xyz' target="_blank" rel="noreferrer" className='link'>salonclients.xyz</a>. Follow the steps under <Link className='link' to="/user-settings">User Details</Link> to learn how to transfer your existing clients.</p>
+            </div>
+          ) : null
+        }
       >
         <Routes>
           <Route path="/" element={

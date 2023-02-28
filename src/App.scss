@@ -14,4 +14,17 @@
     align-items: center;
     text-align: center;
   }
+  .main-banner {
+    background: white;
+    padding: 1rem;
+    box-shadow: 0 -5px 10px rgba(black,.125);
+    span {
+      font-weight: bold;
+      color: var(--color-danger)
+    }
+  }
+  .link {
+    color: var(--color-primary);
+    text-decoration: underline;
+  }
 }

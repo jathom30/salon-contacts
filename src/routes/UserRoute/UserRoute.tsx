@@ -63,7 +63,7 @@ export const UserRoute = () => {
 
     const limit = RateLimit(5) // requests per second
 
-    let contactsWithNotes: { name: string, email?: string, phone_number?: string, notes: { date: string, detail: string }[] }[] = []
+    let contactsWithNotes: { name: string, email?: string, phoneNumber?: string, notes: { createdAt: string, body: string }[] }[] = []
 
     for (const contact of contacts) {
       await limit()
@@ -74,12 +74,12 @@ export const UserRoute = () => {
         {
           name: contact.name,
           ...(contact.email && { email: contact.email }),
-          ...(contact.phone_number && { phone_number: contact.phone_number }),
+          ...(contact.phone_number && { phoneNumber: contact.phone_number }),
           notes: notes.map(note => {
             const date = (new Date(note.date)).toDateString()
             return {
-              date,
-              detail: note.details,
+              createdAt: date,
+              body: note.details,
             }
           })
         }
@@ -135,14 +135,24 @@ export const UserRoute = () => {
         </p>
         <FlexBox flexDirection="column" gap="1rem">
           <h3>Download your contacts</h3>
-          <p>Its never a bad idea to back up your contacts. Click the button below to download your contacts as a json file.</p>
+          <p><strong>NOTICE:</strong> This website will go offline as of <strong>February 2024</strong>. At that time users will no longer be able to retrieve client info. We have a new service up at <a href='https://www.salonclients.xyz' target="_blank" rel="noreferrer" className='link'>salonclients.xyz</a>.</p>
+          <h4>To transfer your existing clients to the new service:</h4>
+          <ol>
+            <li>Click the <strong>Download JSON</strong> button below to download your clients file.</li>
+            <li>Create a new account at <a href='https://www.salonclients.xyz' target="_blank" rel="noreferrer" className='link'>salonclients.xyz</a></li>
+            <li>Upload your saved json file from the User Settings page and that's it!</li>
+          </ol>
           <Button
             icon={isDownloading ? undefined : faDownload}
             onClick={handleDownloadContacts}
             isDisabled={isDownloading}
+            kind="primary"
           >
             {isDownloading ? <Loader /> : 'Download JSON'}
           </Button>
+          <h4>Why are we switching services?</h4>
+          <p>There are a variety of reasons we've decided to end this service in favor of the new one. To keep things simple, <strong>speed</strong>. We want to be able to offer our users the fastest experience possible and don't feel we can properly do that without an architectural update. There are a number of more techie reasons, but we wont bore you with the details.</p>
+          <p>If you have any questions, reach out to our support team at <a className="link" href="mailto:support@salonclients.xyz">support@salonclients.xyz</a></p>
         </FlexBox>
       </FlexBox>
       {showSuccess && (
